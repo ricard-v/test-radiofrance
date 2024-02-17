@@ -8,7 +8,7 @@ Le test technique est réalisé avec Android Studio dans version Hedgehog - 2023
 
 Il a démarré le 16 / 02 / 2024 au soir et a été conclu le xx / xx / xx. 
 
-Le projet supporte Android 6 (API 23) au minimum, à la demande du client, et cible Android 14 (API 33), dernière version en date d’Android.
+Le projet supporte Android 6 (API 23) au minimum, à la demande du client, et cible Android 14 (API 34), dernière version en date d’Android.
 
 Enfin, le design de l’application suit les préceptes de base du Material Design 3 (aka “You”).
 
