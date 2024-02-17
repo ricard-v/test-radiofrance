@@ -31,7 +31,7 @@ ext {
     // Kotlin
     kotlin_coroutines_version = '1.8.0'
     kotlin_collections_version = '0.3.7'
-    kotlin_stdlib_version = '1.9.22'
+    kotlin_version = '1.9.22'
 
     // Tests
     androidx_test_espresso_version = '3.5.1'
