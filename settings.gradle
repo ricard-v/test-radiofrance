@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Test Radio France"
 include ':app'
+include ':core'
+include ':design'
