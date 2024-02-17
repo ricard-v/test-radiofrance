@@ -14,7 +14,7 @@ project.ext {
     minSdkVersion = 23
     targetSdkVersion = 34
 
-    javaVersion = JavaVersion.VERSION_20
+    javaVersion = JavaVersion.VERSION_17
 
     kotlinJvmTarget = javaVersion.toString()
     kotlinCompilerExtensionVersion = '1.5.9'

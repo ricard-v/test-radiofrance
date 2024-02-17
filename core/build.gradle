@@ -1,6 +1,13 @@
 plugins {
     id 'java-library'
     id 'org.jetbrains.kotlin.jvm'
+    id 'com.apollographql.apollo3' version '3.8.2' apply true
+}
+
+apollo {
+    service("service") {
+        packageName.set("tech.mksoft.testradiofrance.core")
+    }
 }
 
 java {

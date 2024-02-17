@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import tech.mksoft.testradiofrance.core.data.source.RadioStationsDataSource
+import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationRoute
 import tech.mksoft.testradiofrance.ui.theme.TestRadioFranceTheme
 import tech.mksoft.testradiofrance.ui.theme.Typography
 
@@ -28,12 +28,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            text = "Test Technique de Radio France\nFévrier 2024",
-                            style = Typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.align(Alignment.TopCenter).padding(16.dp),
-                        )
+                        RadioStationRoute()
                     }
                 }
             }
