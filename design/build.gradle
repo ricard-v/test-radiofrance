@@ -1,0 +1,65 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'tech.mksoft.testradiofrance.design'
+    compileSdk project.targetSdkVersion
+
+    defaultConfig {
+        minSdk project.minSdkVersion
+        targetSdk project.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility project.javaVersion
+        targetCompatibility project.javaVersion
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion project.kotlinCompilerExtensionVersion
+    }
+}
+
+dependencies {
+    // Android X
+    // Android X > Compose
+    implementation platform("androidx.compose:compose-bom:$androidx_compose_bom_version")
+    implementation "androidx.compose.animation:animation"
+    implementation "androidx.compose.animation:animation-core"
+    implementation "androidx.compose.animation:animation-graphics"
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.ui:ui-graphics"
+    implementation "androidx.compose.ui:ui-tooling-preview"
+    implementation "androidx.compose.material3:material3"
+
+    debugImplementation "androidx.compose.ui:ui-tooling"
+    debugImplementation "androidx.compose.ui:ui-test-manifest"
+
+    // Tests
+    // Tests > UI
+    androidTestImplementation platform("androidx.compose:compose-bom:$androidx_compose_bom_version")
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4"
+
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidx_test_espresso_version"
+    androidTestImplementation "androidx.test.ext:junit:$androidx_test_junit_version"
+}

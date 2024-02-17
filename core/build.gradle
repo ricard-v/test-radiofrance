@@ -1,0 +1,25 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+java {
+    sourceCompatibility = project.javaVersion
+    targetCompatibility = project.javaVersion
+}
+
+dependencies {
+    // Kotlin
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version"
+
+    // DI
+    implementation "io.insert-koin:koin-core:$koin_version"
+
+    // Apollo
+    implementation "com.apollographql.apollo3:apollo-runtime:$apollo_version"
+
+    // Tests
+    // Tests > Unit
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutines_version"
+}
