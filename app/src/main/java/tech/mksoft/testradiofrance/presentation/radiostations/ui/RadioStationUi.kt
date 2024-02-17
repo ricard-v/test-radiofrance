@@ -1,7 +1,10 @@
 package tech.mksoft.testradiofrance.presentation.radiostations.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,8 +20,8 @@ import org.koin.androidx.compose.koinViewModel
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
 import tech.mksoft.testradiofrance.design.components.ErrorState
 import tech.mksoft.testradiofrance.design.components.LoadingState
-import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationsState
 import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationsViewModel
+import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationsUiState
 import tech.mksoft.testradiofrance.ui.theme.Typography
 
 @Composable
@@ -28,25 +31,37 @@ fun RadioStationsUi() {
 
     Box(modifier = Modifier.fillMaxSize()) {
         when (val value = state) {
-            is RadioStationsState.Empty -> LaunchedEffect(Unit) {
+            is RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
                 viewModel.fetchRadioStations()
             }
 
-            is RadioStationsState.Loading -> LoadingState()
-            is RadioStationsState.Error -> ErrorState(message = value.errorMessage)
-            is RadioStationsState.Success -> RadioStationsList(stations = value.stations)
+            is RadioStationsUiState.Loading -> LoadingState()
+            is RadioStationsUiState.Error -> ErrorState(message = value.errorMessage)
+            is RadioStationsUiState.Success -> RadioStationsList(stations = value.stations, onStationClicked = value.onStationClicked)
         }
     }
 }
 
 @Composable
-private fun RadioStationsList(stations: ImmutableList<RadioStation>) {
+private fun RadioStationsList(
+    stations: ImmutableList<RadioStation>,
+    onStationClicked: (RadioStation) -> Unit,
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(
+            vertical = 40.dp,
+            horizontal = 16.dp,
+        ),
         modifier = Modifier.fillMaxSize(),
     ) {
-        items(stations) { item: RadioStation ->
-            Text(text = item.name, style = Typography.bodyMedium)
+        items(stations) { stationItem: RadioStation ->
+            Column(
+                modifier = Modifier.clickable { onStationClicked.invoke(stationItem) },
+            ) {
+                Text(text = stationItem.name, style = Typography.bodyMedium)
+                Text(text = stationItem.description, style = Typography.bodySmall)
+            }
         }
     }
 }

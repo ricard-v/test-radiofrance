@@ -91,6 +91,7 @@ dependencies {
     // Tests
     // Tests > Unit
     testImplementation "junit:junit:$junit_version"
+    testImplementation "io.mockk:mockk:$mockk_version"
 
     // Tests > UI
     androidTestImplementation platform("androidx.compose:compose-bom:$androidx_compose_bom_version")

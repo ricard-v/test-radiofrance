@@ -37,7 +37,7 @@ ext {
     androidx_test_espresso_version = '3.5.1'
     androidx_test_junit_version = '1.1.5'
     junit_version = '4.13.2'
-    mockk_version = '1.12.8'
+    mockk_version = '1.13.9'
 
     // Misc
     apollo_version = '3.8.2'
