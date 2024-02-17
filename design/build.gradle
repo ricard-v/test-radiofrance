@@ -41,6 +41,9 @@ android {
 }
 
 dependencies {
+    // Internal Dependencies
+    implementation project(path: ':core')
+
     // Android X
     // Android X > Compose
     implementation platform("androidx.compose:compose-bom:$androidx_compose_bom_version")

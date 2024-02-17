@@ -1,4 +1,4 @@
-package tech.mksoft.testradiofrance.ui.theme
+package tech.mksoft.testradiofrance.design.theme
 
 import androidx.compose.material3.Typography
 

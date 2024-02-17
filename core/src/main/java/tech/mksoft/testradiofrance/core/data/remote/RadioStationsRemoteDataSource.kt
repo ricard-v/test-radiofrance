@@ -4,6 +4,7 @@ import com.apollographql.apollo3.ApolloClient
 import tech.mksoft.testradiofrance.core.BrandsQuery
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
 import tech.mksoft.testradiofrance.core.common.asNotEmpty
+import tech.mksoft.testradiofrance.core.common.extensions.nullIfEmpty
 import tech.mksoft.testradiofrance.core.common.graphql.mapResult
 import tech.mksoft.testradiofrance.core.common.graphql.safeApiCall
 import tech.mksoft.testradiofrance.core.common.toSuccess
@@ -32,6 +33,6 @@ class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : Ra
 private fun BrandsQuery.Brand.toDomain(): RadioStation = RadioStation(
     id = this.id,
     name = this.title,
-    pitch = this.baseline.orEmpty(),
-    description = this.description.orEmpty(),
+    pitch = this.baseline.nullIfEmpty(),
+    description = this.description.nullIfEmpty(),
 )
