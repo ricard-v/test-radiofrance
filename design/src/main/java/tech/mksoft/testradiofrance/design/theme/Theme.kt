@@ -1,8 +1,7 @@
-package tech.mksoft.testradiofrance.ui.theme
+package tech.mksoft.testradiofrance.design.theme
 
 import android.app.Activity
 import android.os.Build
-import android.provider.CalendarContract.Colors
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -35,8 +34,10 @@ fun TestRadioFranceTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val view = LocalView.current
+    
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !view.isInEditMode -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
@@ -44,13 +45,19 @@ fun TestRadioFranceTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    val view = LocalView.current
+
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = Color.Transparent.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-            WindowCompat.setDecorFitsSystemWindows(window, true)
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+
+            val insetsController = WindowCompat.getInsetsController(window, view)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                insetsController.isAppearanceLightNavigationBars = !darkTheme
+                window.navigationBarColor = Color.Transparent.toArgb()
+            }
         }
     }
 

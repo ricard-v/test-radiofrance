@@ -1,0 +1,8 @@
+query Brands {
+    brands {
+        id
+        title
+        baseline
+        description
+    }
+}
