@@ -42,20 +42,20 @@ fun RadioStationsUi() {
     AppScaffold(
         pageTitle = stringResource(id = R.string.app_name),
     ) { contentPadding ->
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Crossfade(
-                targetState = state,
-                label = "RadioStationsUi - Cross Fade Animator",
-            ) { currentState ->
+        Crossfade(
+            targetState = state,
+            label = "RadioStationsUi - Cross Fade Animator",
+        ) { currentState ->
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 when (currentState) {
                     is RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
                         viewModel.fetchRadioStations()
                     }
 
-                    is RadioStationsUiState.Loading -> LoadingState()
-                    is RadioStationsUiState.Error -> ErrorState(message = currentState.errorMessage)
+                    is RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
+                    is RadioStationsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
                     is RadioStationsUiState.Success -> RadioStationsList(
                         stations = currentState.stations,
                         onStationClicked = currentState.onStationClicked,
@@ -77,7 +77,7 @@ private fun RadioStationsList(
 ) {
     val pullRefreshState = rememberPullToRefreshState()
     if (pullRefreshState.isRefreshing) {
-        LaunchedEffect(true) {
+        LaunchedEffect(Unit) {
             onRefreshRequested.invoke()
             pullRefreshState.endRefresh()
         }

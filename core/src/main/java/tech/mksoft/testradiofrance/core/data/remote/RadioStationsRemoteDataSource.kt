@@ -1,6 +1,7 @@
 package tech.mksoft.testradiofrance.core.data.remote
 
 import com.apollographql.apollo3.ApolloClient
+import kotlinx.coroutines.delay
 import tech.mksoft.testradiofrance.core.BrandsQuery
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
 import tech.mksoft.testradiofrance.core.common.asNotEmpty
@@ -13,6 +14,7 @@ import tech.mksoft.testradiofrance.core.domain.model.RadioStation
 
 class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : RadioStationsDataSource {
     override suspend fun getAvailableStations(): DataRequestResult<List<RadioStation>> {
+        delay(2500L)
         return safeApiCall {
             apolloClient
                 .query(BrandsQuery())

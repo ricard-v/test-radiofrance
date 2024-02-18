@@ -7,6 +7,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun BoxScope.ErrorState(message: String) {
-    Text(text = message, modifier = Modifier.align(Alignment.Center))
+fun BoxScope.ErrorState(message: String, modifier: Modifier = Modifier) {
+    Text(text = message, modifier = modifier.align(Alignment.Center))
 }
