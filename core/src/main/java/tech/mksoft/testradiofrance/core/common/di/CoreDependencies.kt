@@ -5,14 +5,17 @@ import tech.mksoft.testradiofrance.core.common.graphql.ApolloClientFactory
 import tech.mksoft.testradiofrance.core.data.remote.RadioStationsRemoteDataSource
 import tech.mksoft.testradiofrance.core.data.repository.RadioStationsRepository
 import tech.mksoft.testradiofrance.core.data.source.RadioStationsDataSource
-import tech.mksoft.testradiofrance.core.domain.GetRadioStationsUseCase
+import tech.mksoft.testradiofrance.core.domain.usecase.GetRadioStationsUseCase
+import tech.mksoft.testradiofrance.core.domain.usecase.GetStationsPrograms
 
 val coreModule = module {
     single { ApolloClientFactory.makeClient() }
 
-    // region Radio Stations
     factory<RadioStationsDataSource> { RadioStationsRemoteDataSource(get()) }
     single { RadioStationsRepository(get()) }
+
+    // region Use Cases
     factory { GetRadioStationsUseCase(get()) }
-    // endregion Radio Stations
+    factory { GetStationsPrograms(get()) }
+    // endregion Use Cases
 }

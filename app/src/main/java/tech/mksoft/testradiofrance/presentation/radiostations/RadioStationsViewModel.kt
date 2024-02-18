@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
-import tech.mksoft.testradiofrance.core.domain.GetRadioStationsUseCase
+import tech.mksoft.testradiofrance.core.domain.usecase.GetRadioStationsUseCase
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
 import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationNavigation
 import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationsUiState

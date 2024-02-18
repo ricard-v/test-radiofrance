@@ -13,7 +13,7 @@ import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
-import tech.mksoft.testradiofrance.core.domain.GetRadioStationsUseCase
+import tech.mksoft.testradiofrance.core.domain.usecase.GetRadioStationsUseCase
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
 import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationsUiState
 import tech.mksoft.testradiofrance.presentation.radiostations.model.ShowProgramsForStation

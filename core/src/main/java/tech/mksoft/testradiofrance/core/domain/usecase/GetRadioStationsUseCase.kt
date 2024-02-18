@@ -1,4 +1,4 @@
-package tech.mksoft.testradiofrance.core.domain
+package tech.mksoft.testradiofrance.core.domain.usecase
 
 import tech.mksoft.testradiofrance.core.data.repository.RadioStationsRepository
 
