@@ -24,10 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import org.koin.androidx.compose.koinViewModel
+import tech.mksoft.testradiofrance.design.R
 import tech.mksoft.testradiofrance.core.domain.model.StationProgram
 import tech.mksoft.testradiofrance.design.components.AppScaffold
 import tech.mksoft.testradiofrance.design.components.ErrorState
@@ -157,7 +159,7 @@ private fun LoadMoreProgramsItem(loadMorePrograms: LoadMorePrograms) {
                     onClick = loadMorePrograms.onClicked,
                     modifier = Modifier.align(Alignment.Center)
                 ) {
-                    Text(text = "Voir plus de programmes")
+                    Text(text = stringResource(id = R.string.station_programs_load_more_programs))
                 }
             }
         }

@@ -1,3 +1,3 @@
 <resources>
-    <string name="app_name">Test Radio France</string>
+    <string name="app_name" translatable="false">Test Radio France</string>
 </resources>

@@ -16,10 +16,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
+import tech.mksoft.testradiofrance.design.R
 import tech.mksoft.testradiofrance.design.theme.TestRadioFranceTheme
 import tech.mksoft.testradiofrance.design.theme.Typography
 
@@ -80,13 +82,13 @@ private fun ColumnScope.SeeAllProgramsButton(onClicked: () -> Unit) {
         onClick = onClicked,
         modifier = Modifier.align(Alignment.End),
     ) {
-        Text(text = "Voir tous les programmes")
+        Text(text = stringResource(id = R.string.radio_station_see_all_programs_button))
         Spacer(modifier = Modifier.width(8.dp))
         Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
     }
 }
 
-// region Prewviews
+// region Previews
 @PreviewLightDark
 @Composable
 private fun MakePreviewFullContent() {
@@ -120,4 +122,4 @@ private fun MakePreviewMisingSomeContent() {
         }
     }
 }
-// endregion Prewviews
+// endregion Previews

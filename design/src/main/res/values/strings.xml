@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- region Radio Stations -->
+    <string name="radio_station_see_all_programs_button">See all programs</string>
+    <!-- endregion Radio Stations -->
+
+    <!-- region Station Programs -->
+    <string name="station_programs_load_more_programs">Load more programs</string>
+    <!-- endregion Station Programs -->
+</resources>
