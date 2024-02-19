@@ -6,6 +6,6 @@ import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationsViewM
 import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsViewModel
 
 val appModule = module {
-    viewModel { RadioStationsViewModel(get()) }
+    viewModel { RadioStationsViewModel(get(), get()) }
     viewModel { StationProgramsViewModel(get()) }
 }

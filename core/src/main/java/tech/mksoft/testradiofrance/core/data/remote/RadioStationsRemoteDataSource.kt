@@ -10,7 +10,7 @@ import tech.mksoft.testradiofrance.core.common.asNotEmpty
 import tech.mksoft.testradiofrance.core.common.extensions.nullIfEmpty
 import tech.mksoft.testradiofrance.core.common.graphql.mapResult
 import tech.mksoft.testradiofrance.core.common.graphql.safeApiCall
-import tech.mksoft.testradiofrance.core.common.toSuccess
+import tech.mksoft.testradiofrance.core.common.wrapAsSuccess
 import tech.mksoft.testradiofrance.core.data.source.RadioStationsDataSource
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
 import tech.mksoft.testradiofrance.core.domain.model.StationProgram
@@ -29,7 +29,7 @@ class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : Ra
             return@mapResult brands
                 .mapNotNull { it?.toDomain() }
                 .asNotEmpty()
-                ?.toSuccess()
+                ?.wrapAsSuccess()
                 ?: DataRequestResult.Error(errorMessage = "Mapping failed while getAvailableStations")
         }
     }
@@ -53,7 +53,7 @@ class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : Ra
             return@mapResult edges
                 .mapNotNull { it?.toDomain() }
                 .asNotEmpty()
-                ?.toSuccess()
+                ?.wrapAsSuccess()
                 ?: DataRequestResult.Error(errorMessage = "Mapping failed while getProgramsByStationId for station id <$stationId>")
         }
     }

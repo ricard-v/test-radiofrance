@@ -1,8 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
 package tech.mksoft.testradiofrance.presentation.radiostations.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -23,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import tech.mksoft.testradiofrance.R
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
@@ -42,26 +46,37 @@ fun RadioStationsUi() {
     AppScaffold(
         pageTitle = stringResource(id = R.string.app_name),
     ) { contentPadding ->
-        Crossfade(
-            targetState = state,
-            label = "RadioStationsUi - Cross Fade Animator",
-        ) { currentState ->
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                when (currentState) {
-                    RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
-                        viewModel.fetchRadioStations()
-                    }
+        (state as? RadioStationsUiState.Success)?.let {
+            RadioStationsList(
+                stations = it.stations,
+                onStationClicked = it.onStationClicked,
+                onFavoriteClicked = it.onFavoriteButtonClicked,
+                onRefreshRequested = { viewModel.fetchRadioStations() },
+                contentPadding = contentPadding,
+            )
+        } ?: run {
+            Crossfade(
+                targetState = state,
+                label = "RadioStationsUi - Cross Fade Animator",
+            ) { currentState ->
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    when (currentState) {
+                        RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
+                            viewModel.fetchRadioStations()
+                        }
 
-                    RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
-                    is RadioStationsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
-                    is RadioStationsUiState.Success -> RadioStationsList(
-                        stations = currentState.stations,
-                        onStationClicked = currentState.onStationClicked,
-                        onRefreshRequested = { viewModel.fetchRadioStations() },
-                        contentPadding = contentPadding,
-                    )
+                        RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
+                        is RadioStationsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
+                        is RadioStationsUiState.Success -> RadioStationsList(
+                            stations = currentState.stations,
+                            onStationClicked = currentState.onStationClicked,
+                            onFavoriteClicked = currentState.onFavoriteButtonClicked,
+                            onRefreshRequested = { viewModel.fetchRadioStations() },
+                            contentPadding = contentPadding,
+                        )
+                    }
                 }
             }
         }
@@ -72,6 +87,7 @@ fun RadioStationsUi() {
 private fun RadioStationsList(
     stations: ImmutableList<RadioStation>,
     onStationClicked: (RadioStation) -> Unit,
+    onFavoriteClicked: (RadioStation) -> Unit,
     onRefreshRequested: () -> Unit,
     contentPadding: PaddingValues,
 ) {
@@ -88,6 +104,7 @@ private fun RadioStationsList(
             .fillMaxSize()
             .nestedScroll(pullRefreshState.nestedScrollConnection),
     ) {
+
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = contentPadding plus PaddingValues(
@@ -96,12 +113,22 @@ private fun RadioStationsList(
                 bottom = 40.dp,
                 end = 16.dp,
             ),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(stations) { stationItem: RadioStation ->
-                RadioStationCard(radioStation = stationItem) {
-                    onStationClicked.invoke(stationItem)
-                }
+            items(
+                items = stations,
+                key = { stationItem -> stationItem.name },
+            ) { stationItem: RadioStation ->
+                RadioStationCard(
+                    radioStation = stationItem,
+                    onSeeAllProgramsClicked = {
+                        onStationClicked.invoke(stationItem)
+                    },
+                    onFavoriteClicked = {
+                        onFavoriteClicked.invoke(stationItem)
+                    },
+                    modifier = Modifier.animateItemPlacement(),
+                )
             }
         }
 

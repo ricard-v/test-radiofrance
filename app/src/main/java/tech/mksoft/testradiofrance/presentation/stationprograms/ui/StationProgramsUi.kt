@@ -82,7 +82,12 @@ fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
                             modifier = Modifier.padding(contentPadding),
                         )
 
-                        else -> Unit // Nothing to do here
+                        is StationProgramsUiState.Success -> StationProgramsList(
+                            programs = currentState.programs,
+                            loadMorePrograms = currentState.loadMorePrograms,
+                            onRefreshRequested = { viewModel.fetchProgramsForStation(stationId) },
+                            contentPadding = contentPadding,
+                        )
                     }
                 }
             }
