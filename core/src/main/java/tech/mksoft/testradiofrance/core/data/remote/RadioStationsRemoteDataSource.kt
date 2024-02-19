@@ -1,6 +1,8 @@
 package tech.mksoft.testradiofrance.core.data.remote
 
 import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo3.api.Optional
+import kotlinx.coroutines.delay
 import tech.mksoft.testradiofrance.core.BrandsQuery
 import tech.mksoft.testradiofrance.core.ShowsQuery
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
@@ -32,11 +34,17 @@ class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : Ra
         }
     }
 
-    override suspend fun getProgramsByStationId(stationId: String): DataRequestResult<List<StationProgram>> {
+    override suspend fun getProgramsByStationId(stationId: String, count: Int, fromCursor: String?): DataRequestResult<List<StationProgram>> {
         return safeApiCall {
             val stationEnumValue: StationsEnum = StationsEnum.valueOf(stationId)
             apolloClient
-                .query(ShowsQuery(station = stationEnumValue))
+                .query(
+                    ShowsQuery(
+                        station = stationEnumValue,
+                        first = Optional.present(count),
+                        after = Optional.presentIfNotNull(fromCursor),
+                    )
+                )
                 .execute()
         } mapResult { data ->
             val edges = data.shows?.edges.asNotEmpty()

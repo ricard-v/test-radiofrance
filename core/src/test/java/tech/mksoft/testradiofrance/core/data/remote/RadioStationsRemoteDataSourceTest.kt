@@ -3,6 +3,7 @@ package tech.mksoft.testradiofrance.core.data.remote
 import com.apollographql.apollo3.ApolloCall
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.ApolloResponse
+import com.apollographql.apollo3.api.Optional
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import io.mockk.clearAllMocks
@@ -125,7 +126,15 @@ class RadioStationsRemoteDataSourceTest {
         val expectedErrorMessage = "Internal Error"
 
         // GIVEN
-        coEvery { mockedApolloClient.query(ShowsQuery(StationsEnum.FRANCEINFO)) } returns mockk {
+        coEvery {
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(10),
+                    after = Optional.presentIfNotNull(null),
+                ),
+            )
+        } returns mockk {
             coEvery { execute() } throws ApolloHttpException(
                 message = expectedErrorMessage,
                 statusCode = 500,
@@ -135,7 +144,7 @@ class RadioStationsRemoteDataSourceTest {
         }
 
         // WHEN
-        val result = systemUnderTest.getProgramsByStationId(stationId = stationId)
+        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null)
 
         // THEN
         assertIs<DataRequestResult.Error>(result).run {
@@ -144,7 +153,13 @@ class RadioStationsRemoteDataSourceTest {
         }
 
         coVerify(exactly = 1) {
-            mockedApolloClient.query(ShowsQuery(StationsEnum.FRANCEINFO))
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(10),
+                    after = Optional.presentIfNotNull(null),
+                )
+            )
         }
     }
 
@@ -154,12 +169,20 @@ class RadioStationsRemoteDataSourceTest {
         val expectedErrorMessage = "Missing internet access"
 
         // GIVEN
-        coEvery { mockedApolloClient.query(ShowsQuery(StationsEnum.FRANCEINFO)) } returns mockk {
+        coEvery {
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(10),
+                    after = Optional.presentIfNotNull(null),
+                ),
+            )
+        } returns mockk {
             coEvery { execute() } throws ApolloNetworkException(message = expectedErrorMessage)
         }
 
         // WHEN
-        val result = systemUnderTest.getProgramsByStationId(stationId = stationId)
+        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null)
 
         // THEN
         assertIs<DataRequestResult.Error>(result).run {
@@ -168,7 +191,13 @@ class RadioStationsRemoteDataSourceTest {
         }
 
         coVerify(exactly = 1) {
-            mockedApolloClient.query(ShowsQuery(StationsEnum.FRANCEINFO))
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(10),
+                    after = Optional.presentIfNotNull(null),
+                )
+            )
         }
     }
 
@@ -205,10 +234,18 @@ class RadioStationsRemoteDataSourceTest {
             coEvery { execute() } returns mockedApolloResponse
         }
 
-        coEvery { mockedApolloClient.query(ShowsQuery(StationsEnum.FRANCEINFO)) } returns mockedQuery
+        coEvery {
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(10),
+                    after = Optional.presentIfNotNull(null),
+                ),
+            )
+        } returns mockedQuery
 
         // WHEN
-        val result = systemUnderTest.getProgramsByStationId(stationId)
+        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null)
 
         // THEN
         assertIs<DataRequestResult.Success<List<StationProgram>>>(result).run {
@@ -223,7 +260,107 @@ class RadioStationsRemoteDataSourceTest {
         }
 
         coVerify(exactly = 1) {
-            mockedApolloClient.query(ShowsQuery(StationsEnum.FRANCEINFO))
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(10),
+                    after = Optional.presentIfNotNull(null),
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `GIVEN the request is successful WHEN requesting more programs THEN returns Success`() = runTest {
+        val stationId = StationsEnum.FRANCEINFO.name
+        val sampleEdges = listOf(
+            ShowsQuery.Edge(
+                cursor = "cursor_1",
+                node = ShowsQuery.Node(
+                    id = "id_1",
+                    title = "title_1",
+                    standFirst = "standfirst_1",
+                )
+            ),
+            ShowsQuery.Edge(
+                cursor = "cursor_2",
+                node = ShowsQuery.Node(
+                    id = "id_2",
+                    title = "title_2",
+                    standFirst = "null",
+                )
+            )
+        )
+
+        // GIVEN
+        val mockedApolloResponse: ApolloResponse<ShowsQuery.Data> = mockk()
+        every { mockedApolloResponse.hasErrors() } returns false
+        every { mockedApolloResponse.getData() } returnsMany listOf(
+            ShowsQuery.Data(
+                shows = ShowsQuery.Shows(edges = sampleEdges.take(1))
+            ),
+            ShowsQuery.Data(
+                shows = ShowsQuery.Shows(edges = sampleEdges.subList(1, 2))
+            ),
+        )
+
+        val mockedQuery: ApolloCall<ShowsQuery.Data> = mockk {
+            coEvery { execute() } returns mockedApolloResponse
+        }
+
+        coEvery {
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(1),
+                    after = Optional.presentIfNotNull(null),
+                ),
+            )
+        } returns mockedQuery
+
+        coEvery {
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(1),
+                    after = Optional.presentIfNotNull(sampleEdges[1].cursor),
+                ),
+            )
+        } returns mockedQuery
+
+        systemUnderTest.getProgramsByStationId(stationId = stationId, count = 1, fromCursor = null)
+
+        // WHEN
+        val loadMoreResult = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 1, fromCursor = sampleEdges[1].cursor)
+
+        // THEN
+        assertIs<DataRequestResult.Success<List<StationProgram>>>(loadMoreResult).run {
+            val expected = sampleEdges[1]
+            val actual = data[0]
+            assertEquals(expected.cursor, actual.cursor)
+            assertEquals(expected.node!!.id, actual.id)
+            assertEquals(expected.node!!.title, actual.title)
+            assertEquals(expected.node!!.standFirst, actual.description)
+        }
+
+        coVerify(exactly = 1) {
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(1),
+                    after = Optional.presentIfNotNull(null),
+                )
+            )
+        }
+
+        coVerify(exactly = 1) {
+            mockedApolloClient.query(
+                ShowsQuery(
+                    station = StationsEnum.FRANCEINFO,
+                    first = Optional.present(1),
+                    after = Optional.presentIfNotNull(sampleEdges[1].cursor),
+                )
+            )
         }
     }
     // endregion getProgramsByStationId() Tests

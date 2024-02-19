@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -33,6 +36,7 @@ import tech.mksoft.testradiofrance.design.components.NavigationAction
 import tech.mksoft.testradiofrance.design.components.StationProgramCard
 import tech.mksoft.testradiofrance.design.tools.plus
 import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsViewModel
+import tech.mksoft.testradiofrance.presentation.stationprograms.model.LoadMorePrograms
 import tech.mksoft.testradiofrance.presentation.stationprograms.model.StationProgramsUiState
 
 @Composable
@@ -47,27 +51,37 @@ fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
             onClicked = onBackArrowClicked,
         )
     ) { contentPadding ->
-        Crossfade(
-            targetState = state,
-            label = "StationProgramsUi - Cross Fade Animator",
-        ) { currentState ->
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                when (currentState) {
-                    StationProgramsUiState.Empty -> {
-                        LaunchedEffect(Unit) {
-                            viewModel.fetchProgramsForStation(stationId)
+        (state as? StationProgramsUiState.Success)?.let {
+            StationProgramsList(
+                programs = it.programs,
+                loadMorePrograms = it.loadMorePrograms,
+                onRefreshRequested = { viewModel.fetchProgramsForStation(stationId) },
+                contentPadding = contentPadding,
+            )
+        } ?: run {
+            Crossfade(
+                targetState = state,
+                label = "StationProgramsUi - Cross Fade Animator",
+            ) { currentState ->
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when (currentState) {
+                        StationProgramsUiState.Empty -> {
+                            LaunchedEffect(Unit) {
+                                viewModel.fetchProgramsForStation(stationId)
+                            }
                         }
-                    }
 
-                    is StationProgramsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
-                    StationProgramsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
-                    is StationProgramsUiState.Success -> StationProgramsList(
-                        programs = currentState.programs,
-                        onRefreshRequested = { viewModel.fetchProgramsForStation(stationId) },
-                        contentPadding = contentPadding,
-                    )
+                        is StationProgramsUiState.Error -> ErrorState(
+                            message = currentState.errorMessage,
+                            modifier = Modifier.padding(contentPadding),
+                        )
+
+                        StationProgramsUiState.Loading -> LoadingState(
+                            modifier = Modifier.padding(contentPadding),
+                        )
+
+                        else -> Unit // Nothing to do here
+                    }
                 }
             }
         }
@@ -77,6 +91,7 @@ fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
 @Composable
 private fun StationProgramsList(
     programs: ImmutableList<StationProgram>,
+    loadMorePrograms: LoadMorePrograms?,
     onRefreshRequested: () -> Unit,
     contentPadding: PaddingValues,
 ) {
@@ -103,8 +118,15 @@ private fun StationProgramsList(
             ),
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(programs) { programItem: StationProgram ->
+            items(
+                items = programs,
+                key = { programItem -> programItem.id }
+            ) { programItem: StationProgram ->
                 StationProgramCard(stationProgram = programItem)
+            }
+
+            loadMorePrograms?.let {
+                item { LoadMoreProgramsItem(it) }
             }
         }
 
@@ -114,5 +136,30 @@ private fun StationProgramsList(
                 .padding(top = contentPadding.calculateTopPadding())
                 .align(Alignment.TopCenter),
         )
+    }
+}
+
+@Composable
+private fun LoadMoreProgramsItem(loadMorePrograms: LoadMorePrograms) {
+    Crossfade(
+        targetState = loadMorePrograms.isLoading,
+        label = "LoadMoreProgramsItem - Cross Fade Animator",
+    ) { isLoading ->
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            if (isLoading) {
+                LoadingState()
+            } else {
+                OutlinedButton(
+                    onClick = loadMorePrograms.onClicked,
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Text(text = "Voir plus de programmes")
+                }
+            }
+        }
     }
 }

@@ -8,5 +8,6 @@ import tech.mksoft.testradiofrance.core.domain.model.StationProgram
 class RadioStationsRepository(private val dataSource: RadioStationsDataSource) {
     suspend fun getRadioStations(): DataRequestResult<List<RadioStation>> = dataSource.getAvailableStations()
 
-    suspend fun getStationPrograms(stationId: String): DataRequestResult<List<StationProgram>> = dataSource.getProgramsByStationId(stationId)
+    suspend fun getStationPrograms(stationId: String, count: Int, fromCursor: String?): DataRequestResult<List<StationProgram>> =
+        dataSource.getProgramsByStationId(stationId, count, fromCursor)
 }

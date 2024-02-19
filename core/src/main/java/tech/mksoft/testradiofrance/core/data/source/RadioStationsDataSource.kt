@@ -7,5 +7,5 @@ import tech.mksoft.testradiofrance.core.domain.model.StationProgram
 interface RadioStationsDataSource {
     suspend fun getAvailableStations(): DataRequestResult<List<RadioStation>>
 
-    suspend fun getProgramsByStationId(stationId: String): DataRequestResult<List<StationProgram>>
+    suspend fun getProgramsByStationId(stationId: String, count: Int, fromCursor: String?): DataRequestResult<List<StationProgram>>
 }
