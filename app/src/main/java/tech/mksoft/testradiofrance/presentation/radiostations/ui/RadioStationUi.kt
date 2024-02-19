@@ -50,11 +50,11 @@ fun RadioStationsUi() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 when (currentState) {
-                    is RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
+                    RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
                         viewModel.fetchRadioStations()
                     }
 
-                    is RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
+                    RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
                     is RadioStationsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
                     is RadioStationsUiState.Success -> RadioStationsList(
                         stations = currentState.stations,

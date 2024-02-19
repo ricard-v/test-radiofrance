@@ -3,36 +3,31 @@ package tech.mksoft.testradiofrance.presentation.stationprograms
 import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import tech.mksoft.testradiofrance.design.components.AppScaffold
+import tech.mksoft.testradiofrance.design.components.ErrorState
 import tech.mksoft.testradiofrance.navigation.NavigationRoute
 import tech.mksoft.testradiofrance.navigation.withNavArgument
 import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsRouteNavigation.getStationNameFromNavArguments
+import tech.mksoft.testradiofrance.presentation.stationprograms.ui.StationProgramsUi
 
 @Composable
-fun StationProgramsRoute(arguments: Bundle?) {
-    AppScaffold(
-        pageTitle = "Programmes",
-    ) { contentPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        ) {
-            Text(
-                text = "show programs for station: ${arguments.getStationNameFromNavArguments()}",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center),
-            )
+fun StationProgramsRoute(
+    navHostController: NavHostController,
+    arguments: Bundle?,
+) {
+    val stationId = arguments.getStationNameFromNavArguments()
+    if (stationId == null) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            ErrorState(message = "Missing station name from arguments!")
+        }
+    } else {
+        StationProgramsUi(stationId = stationId) {
+            navHostController.popBackStack()
         }
     }
 }

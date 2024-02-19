@@ -9,9 +9,7 @@ sealed class RadioStationsUiState {
     data class Success(
         val stations: ImmutableList<RadioStation>,
         val onStationClicked: (RadioStation) -> Unit,
-    ) : RadioStationsUiState() {
-        data class ShowProgramsForStation(val stationName: String)
-    }
+    ) : RadioStationsUiState()
 
     data class Error(val errorMessage: String) : RadioStationsUiState()
 }

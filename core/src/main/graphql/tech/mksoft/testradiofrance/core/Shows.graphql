@@ -1,0 +1,12 @@
+query Shows($station: StationsEnum!, $first: Int! = 10, $after: String = "") {
+    shows(station: $station, first: $first, after: $after) {
+        edges {
+            cursor
+            node {
+                id
+                title
+                standFirst
+            }
+        }
+    }
+}

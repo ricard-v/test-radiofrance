@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="radio_station_see_all_programs_button">Voir tous les programs</string>
+    <string name="station_programs_load_more_programs">Voire plus de programmes</string>
+</resources>
