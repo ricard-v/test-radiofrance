@@ -27,7 +27,10 @@ fun SetupAppNavigation() {
             route = StationProgramsRouteNavigation.routeName,
             arguments = StationProgramsRouteNavigation.navArguments,
         ) {
-            StationProgramsRoute(arguments = it.arguments)
+            StationProgramsRoute(
+                navHostController = navController,
+                arguments = it.arguments,
+            )
         }
     }
 }

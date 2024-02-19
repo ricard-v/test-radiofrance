@@ -86,6 +86,7 @@ private fun ColumnScope.SeeAllProgramsButton(onClicked: () -> Unit) {
     }
 }
 
+// region Prewviews
 @PreviewLightDark
 @Composable
 private fun MakePreviewFullContent() {
@@ -119,3 +120,4 @@ private fun MakePreviewMisingSomeContent() {
         }
     }
 }
+// endregion Prewviews

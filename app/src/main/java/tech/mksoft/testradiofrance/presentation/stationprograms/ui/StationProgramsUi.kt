@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package tech.mksoft.testradiofrance.presentation.radiostations.ui
+package tech.mksoft.testradiofrance.presentation.stationprograms.ui
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -19,47 +21,51 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import org.koin.androidx.compose.koinViewModel
-import tech.mksoft.testradiofrance.R
-import tech.mksoft.testradiofrance.core.domain.model.RadioStation
+import tech.mksoft.testradiofrance.core.domain.model.StationProgram
 import tech.mksoft.testradiofrance.design.components.AppScaffold
 import tech.mksoft.testradiofrance.design.components.ErrorState
 import tech.mksoft.testradiofrance.design.components.LoadingState
-import tech.mksoft.testradiofrance.design.components.RadioStationCard
+import tech.mksoft.testradiofrance.design.components.NavigationAction
+import tech.mksoft.testradiofrance.design.components.StationProgramCard
 import tech.mksoft.testradiofrance.design.tools.plus
-import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationsViewModel
-import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationsUiState
+import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsViewModel
+import tech.mksoft.testradiofrance.presentation.stationprograms.model.StationProgramsUiState
 
 @Composable
-fun RadioStationsUi() {
-    val viewModel = koinViewModel<RadioStationsViewModel>()
+fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
+    val viewModel = koinViewModel<StationProgramsViewModel>()
     val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     AppScaffold(
-        pageTitle = stringResource(id = R.string.app_name),
+        pageTitle = stationId,
+        navigationAction = NavigationAction(
+            icon = Icons.AutoMirrored.Outlined.ArrowBack,
+            onClicked = onBackArrowClicked,
+        )
     ) { contentPadding ->
         Crossfade(
             targetState = state,
-            label = "RadioStationsUi - Cross Fade Animator",
+            label = "StationProgramsUi - Cross Fade Animator",
         ) { currentState ->
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
                 when (currentState) {
-                    RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
-                        viewModel.fetchRadioStations()
+                    StationProgramsUiState.Empty -> {
+                        LaunchedEffect(Unit) {
+                            viewModel.fetchProgramsForStation(stationId)
+                        }
                     }
 
-                    RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
-                    is RadioStationsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
-                    is RadioStationsUiState.Success -> RadioStationsList(
-                        stations = currentState.stations,
-                        onStationClicked = currentState.onStationClicked,
-                        onRefreshRequested = { viewModel.fetchRadioStations() },
+                    is StationProgramsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
+                    StationProgramsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
+                    is StationProgramsUiState.Success -> StationProgramsList(
+                        programs = currentState.programs,
+                        onRefreshRequested = { viewModel.fetchProgramsForStation(stationId) },
                         contentPadding = contentPadding,
                     )
                 }
@@ -69,9 +75,8 @@ fun RadioStationsUi() {
 }
 
 @Composable
-private fun RadioStationsList(
-    stations: ImmutableList<RadioStation>,
-    onStationClicked: (RadioStation) -> Unit,
+private fun StationProgramsList(
+    programs: ImmutableList<StationProgram>,
     onRefreshRequested: () -> Unit,
     contentPadding: PaddingValues,
 ) {
@@ -98,10 +103,8 @@ private fun RadioStationsList(
             ),
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(stations) { stationItem: RadioStation ->
-                RadioStationCard(radioStation = stationItem) {
-                    onStationClicked.invoke(stationItem)
-                }
+            items(programs) { programItem: StationProgram ->
+                StationProgramCard(stationProgram = programItem)
             }
         }
 
