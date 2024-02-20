@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" tools:locale="fr">
     <!-- region Radio Stations -->
     <string name="radio_station_see_all_programs_button">See all programs</string>
+    <string name="radio_station_favorite_button">Mark <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g> station as favorite</string>
+    <string name="radio_station_unfavorite_button">Unmark <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g> station as favorite</string>
     <!-- endregion Radio Stations -->
 
     <!-- region Station Programs -->
-    <string name="station_programs_load_more_programs">Load more programs</string>
+    <string name="station_programs_load_more_programs_button">Load more programs</string>
+    <string name="station_programs_cannot_load_more_programs_label">No more programs available for that station</string>
+    <string name="station_programs_cannot_load_more_programs_button">Scroll to top</string>
     <!-- endregion Station Programs -->
+
+    <!-- region Misc -->
+    <string name="error_state_retry_button">Retry</string>
+    <!-- endregion Misc -->
 </resources>

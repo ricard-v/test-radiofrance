@@ -1,7 +1,9 @@
 package tech.mksoft.testradiofrance.design.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +16,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,14 +32,35 @@ import tech.mksoft.testradiofrance.design.theme.TestRadioFranceTheme
 import tech.mksoft.testradiofrance.design.theme.Typography
 
 @Composable
-fun RadioStationCard(radioStation: RadioStation, onSeeAllProgramsClicked: () -> Unit) {
-    Card {
+fun RadioStationCard(
+    radioStation: RadioStation,
+    onSeeAllProgramsClicked: () -> Unit,
+    onFavoriteClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(modifier = modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(
+                    start = 16.dp,
+                    top = 10.dp,
+                    end = 16.dp,
+                    bottom = 16.dp,
+                ),
         ) {
-            StationName(name = radioStation.name)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                StationName(name = radioStation.name)
+                RadioStationFavoriteButton(
+                    isFavorite = radioStation.isFavorite,
+                    stationName = radioStation.name,
+                    onFavoriteClicked = onFavoriteClicked,
+                )
+            }
 
             radioStation.pitch?.let {
                 Spacer(modifier = Modifier.height(10.dp))
@@ -92,6 +119,10 @@ private fun ColumnScope.SeeAllProgramsButton(onClicked: () -> Unit) {
 @PreviewLightDark
 @Composable
 private fun MakePreviewFullContent() {
+    var isFavorite by remember {
+        mutableStateOf(false)
+    }
+
     TestRadioFranceTheme {
         RadioStationCard(
             radioStation = RadioStation(
@@ -99,16 +130,23 @@ private fun MakePreviewFullContent() {
                 name = "franceinfo",
                 pitch = "Et tout est plus clair",
                 description = "L'actualité en direct et en continu avec le média global du service public",
-            )
-        ) {
-            // nothing to do here
-        }
+                isFavorite = isFavorite,
+            ),
+            onSeeAllProgramsClicked = {}, // nothing to do here
+            onFavoriteClicked = {
+                isFavorite = !isFavorite
+            }
+        )
     }
 }
 
 @PreviewLightDark
 @Composable
 private fun MakePreviewMisingSomeContent() {
+    var isFavorite by remember {
+        mutableStateOf(false)
+    }
+
     TestRadioFranceTheme {
         RadioStationCard(
             radioStation = RadioStation(
@@ -116,10 +154,13 @@ private fun MakePreviewMisingSomeContent() {
                 name = "franceinfo",
                 pitch = null,
                 description = null,
-            )
-        ) {
-            // nothing to do here
-        }
+                isFavorite = isFavorite,
+            ),
+            onSeeAllProgramsClicked = {}, // nothing to do here
+            onFavoriteClicked = {
+                isFavorite = !isFavorite
+            }
+        )
     }
 }
 // endregion Previews

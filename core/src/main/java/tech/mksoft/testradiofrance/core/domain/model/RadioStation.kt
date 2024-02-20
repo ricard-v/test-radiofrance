@@ -5,4 +5,6 @@ data class RadioStation(
     val name: String,
     val pitch: String?,
     val description: String?,
+    val isFavorite: Boolean = false,
+    val position: Int = 0,
 )

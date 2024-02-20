@@ -41,7 +41,7 @@ class RadioStationViewModelTest: BaseTestClass() {
     @Test
     fun `GIVEN everything went fine WHEN fetchRadioStations() THEN State is Loading and THEN Success`() = runTest {
         // GIVEN
-        coEvery { mockedGetRadioStationsUseCase.execute() } returns DataRequestResult.Success(data = listOf(radioStationSample))
+        coEvery { mockedGetRadioStationsUseCase.getRadioStationsFlow() } returns DataRequestResult.Success(data = listOf(radioStationSample))
 
         // WHEN
         systemUnderTest.fetchRadioStations()
@@ -55,7 +55,7 @@ class RadioStationViewModelTest: BaseTestClass() {
             }
         }
 
-        coVerify(exactly = 1) { mockedGetRadioStationsUseCase.execute() }
+        coVerify(exactly = 1) { mockedGetRadioStationsUseCase.getRadioStationsFlow() }
     }
     // endregion UI State Tests
 
@@ -63,7 +63,7 @@ class RadioStationViewModelTest: BaseTestClass() {
     @Test
     fun `GIVEN stations are listed WHEN user clicks on a station THEN Nav directions are given to show its programs`() = runTest {
         // GIVEN
-        coEvery { mockedGetRadioStationsUseCase.execute() } returns DataRequestResult.Success(data = listOf(radioStationSample))
+        coEvery { mockedGetRadioStationsUseCase.getRadioStationsFlow() } returns DataRequestResult.Success(data = listOf(radioStationSample))
         systemUnderTest.fetchRadioStations()
 
         systemUnderTest.uiStateFlow.testAndCancel {
@@ -80,7 +80,7 @@ class RadioStationViewModelTest: BaseTestClass() {
             assertIs<ShowProgramsForStation>(awaitItem())
         }
 
-        coVerify(exactly = 1) { mockedGetRadioStationsUseCase.execute() }
+        coVerify(exactly = 1) { mockedGetRadioStationsUseCase.getRadioStationsFlow() }
     }
     // endregion Navigation Direction Tests
 

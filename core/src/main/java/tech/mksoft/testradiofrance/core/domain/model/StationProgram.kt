@@ -5,4 +5,5 @@ data class StationProgram(
     val cursor: String,
     val title: String,
     val description: String?,
+    val isLast: Boolean = false,
 )

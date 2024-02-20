@@ -1,6 +1,7 @@
 package tech.mksoft.testradiofrance.design.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,6 +20,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 fun AppScaffold(
     pageTitle: String,
     navigationAction: NavigationAction? = null,
+    actions: @Composable RowScope.() -> Unit = {},
     body: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -33,6 +35,7 @@ fun AppScaffold(
                         }
                     }
                 },
+                actions = actions,
                 scrollBehavior = scrollBehavior,
             )
         },

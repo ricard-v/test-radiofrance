@@ -33,19 +33,20 @@ fun StationProgramsRoute(
 }
 
 object StationProgramsRouteNavigation : NavigationRoute {
-    private const val BASE_ROUTE_NAME = "station-programs/"
+    private const val BASE_ROUTE_NAME = "station-programs"
     private const val ARG_STATION_ID = "station_id"
 
-    override val routeName: String = "$BASE_ROUTE_NAME{$ARG_STATION_ID}"
+    override val routeName: String = "$BASE_ROUTE_NAME/{$ARG_STATION_ID}"
     override val navArguments: List<NamedNavArgument> = listOf(
         navArgument(ARG_STATION_ID) {
             type = NavType.StringType
-        }
+        },
     )
 
     fun Bundle?.getStationNameFromNavArguments(): String? = this?.getString(ARG_STATION_ID)
-
     fun NavHostController.navigate(stationId: String) {
-        navigate(route = routeName.withNavArgument(ARG_STATION_ID, stationId))
+        navigate(
+            route = routeName.withNavArgument(ARG_STATION_ID, stationId)
+        )
     }
 }
