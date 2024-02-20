@@ -7,6 +7,12 @@
     <!-- endregion Radio Stations -->
 
     <!-- region Station Programs -->
-    <string name="station_programs_load_more_programs">Load more programs</string>
+    <string name="station_programs_load_more_programs_button">Load more programs</string>
+    <string name="station_programs_cannot_load_more_programs_label">No more programs available for that station</string>
+    <string name="station_programs_cannot_load_more_programs_button">Scroll to top</string>
     <!-- endregion Station Programs -->
+
+    <!-- region Misc -->
+    <string name="error_state_retry_button">Retry</string>
+    <!-- endregion Misc -->
 </resources>

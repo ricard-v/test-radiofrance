@@ -1,11 +1,9 @@
 package tech.mksoft.testradiofrance.core.common.graphql
 
-import android.util.Log
 import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Operation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
 

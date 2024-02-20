@@ -5,12 +5,14 @@ package tech.mksoft.testradiofrance.presentation.stationprograms.ui
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,13 +23,16 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import tech.mksoft.testradiofrance.core.domain.model.StationProgram
@@ -38,6 +43,7 @@ import tech.mksoft.testradiofrance.design.components.LoadingState
 import tech.mksoft.testradiofrance.design.components.NavigationAction
 import tech.mksoft.testradiofrance.design.components.RadioStationFavoriteButton
 import tech.mksoft.testradiofrance.design.components.StationProgramCard
+import tech.mksoft.testradiofrance.design.theme.Typography
 import tech.mksoft.testradiofrance.design.tools.plus
 import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsViewModel
 import tech.mksoft.testradiofrance.presentation.stationprograms.model.LoadMorePrograms
@@ -86,6 +92,7 @@ fun StationProgramsUi(
                         is StationProgramsUiState.Error -> ErrorState(
                             message = currentState.errorMessage,
                             modifier = Modifier.padding(contentPadding),
+                            doOnRetry = currentState.onRetryClicked,
                         )
 
                         StationProgramsUiState.Loading -> LoadingState(
@@ -121,7 +128,10 @@ private fun StationProgramsUiState.Success.StationProgramsList(
             .fillMaxSize()
             .nestedScroll(pullRefreshState.nestedScrollConnection),
     ) {
+        val lazyColumnState = rememberLazyListState()
+
         LazyColumn(
+            state = lazyColumnState,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = contentPadding plus PaddingValues(
                 start = 16.dp,
@@ -140,6 +150,34 @@ private fun StationProgramsUiState.Success.StationProgramsList(
 
             loadMorePrograms?.let {
                 item { LoadMoreProgramsItem(it) }
+            }
+
+            cannotLoadMorePrograms?.let {
+                item {
+                    val coroutineScope = rememberCoroutineScope()
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.station_programs_cannot_load_more_programs_label),
+                            style = Typography.labelLarge,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        OutlinedButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    lazyColumnState.scrollToItem(0, 0)
+                                }
+                            }
+                        ) {
+                            Text(text = stringResource(id = R.string.station_programs_cannot_load_more_programs_button))
+                        }
+                    }
+                }
             }
         }
 
@@ -170,7 +208,7 @@ private fun LoadMoreProgramsItem(loadMorePrograms: LoadMorePrograms) {
                     onClick = loadMorePrograms.onClicked,
                     modifier = Modifier.align(Alignment.Center)
                 ) {
-                    Text(text = stringResource(id = R.string.station_programs_load_more_programs))
+                    Text(text = stringResource(id = R.string.station_programs_load_more_programs_button))
                 }
             }
         }

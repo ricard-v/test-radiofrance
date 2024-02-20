@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="radio_station_see_all_programs_button">Voir tous les programs</string>
-    <string name="station_programs_load_more_programs">Voire plus de programmes</string>
+    <string name="station_programs_load_more_programs_button">Voire plus de programmes</string>
     <string name="radio_station_favorite_button">Mettre la station %1$s en favori</string>
     <string name="radio_station_unfavorite_button">Ne plus mettre la station %1$s en favori</string>
+    <string name="error_state_retry_button">Essayer à nouveau</string>
+    <string name="station_programs_cannot_load_more_programs_label">Plus de programmes disponibles pour cette station</string>
+    <string name="station_programs_cannot_load_more_programs_button">Revenir en haut</string>
 </resources>

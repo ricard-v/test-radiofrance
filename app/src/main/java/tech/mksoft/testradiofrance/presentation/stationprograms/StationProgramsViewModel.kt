@@ -15,6 +15,7 @@ import tech.mksoft.testradiofrance.core.common.DataRequestResult
 import tech.mksoft.testradiofrance.core.domain.model.StationProgram
 import tech.mksoft.testradiofrance.core.domain.usecase.GetStationsPrograms
 import tech.mksoft.testradiofrance.core.domain.usecase.UserPreferencesUseCase
+import tech.mksoft.testradiofrance.presentation.stationprograms.model.CannotLoadMorePrograms
 import tech.mksoft.testradiofrance.presentation.stationprograms.model.LoadMorePrograms
 import tech.mksoft.testradiofrance.presentation.stationprograms.model.StationProgramsUiState
 
@@ -56,13 +57,14 @@ class StationProgramsViewModel(
         return when (result) {
             is DataRequestResult.Error -> StationProgramsUiState.Error(
                 errorMessage = result.errorMessage ?: "Unknown Error",
+                onRetryClicked = ::startFetchingStationPrograms,
                 isFavorite = isFavorite,
             )
 
             is DataRequestResult.Success -> {
                 StationProgramsUiState.Success(
                     programs = result.data.toImmutableList(),
-                    loadMorePrograms = result.data.lastOrNull()?.cursor?.let { lastCursor ->
+                    loadMorePrograms = result.data.lastOrNull()?.takeUnless { it.isLast }?.cursor?.let { lastCursor ->
                         LoadMorePrograms(
                             isLoading = false,
                             onClicked = {
@@ -75,6 +77,7 @@ class StationProgramsViewModel(
                             },
                         )
                     },
+                    cannotLoadMorePrograms = takeIf { result.data.lastOrNull()?.isLast == true }?.let { CannotLoadMorePrograms },
                     isFavorite = isFavorite,
                 )
             }

@@ -19,6 +19,7 @@ sealed class StationProgramsUiState {
 
     data class Error(
         val errorMessage: String,
+        val onRetryClicked: () -> Unit,
         override val isFavorite: Boolean,
     ) : StationProgramsUiState() {
         override fun makeCopy(isFavorite: Boolean): StationProgramsUiState = copy(isFavorite = isFavorite)
@@ -27,6 +28,7 @@ sealed class StationProgramsUiState {
     data class Success(
         val programs: ImmutableList<StationProgram>,
         val loadMorePrograms: LoadMorePrograms?,
+        val cannotLoadMorePrograms: CannotLoadMorePrograms?,
         override val isFavorite: Boolean,
     ) : StationProgramsUiState() {
         override fun makeCopy(isFavorite: Boolean): StationProgramsUiState = copy(isFavorite = isFavorite)
@@ -34,3 +36,5 @@ sealed class StationProgramsUiState {
 }
 
 data class LoadMorePrograms(val isLoading: Boolean, val onClicked: () -> Unit)
+
+data object CannotLoadMorePrograms

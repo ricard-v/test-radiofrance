@@ -48,8 +48,7 @@ class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : Ra
                 )
                 .toFlow()
         } mapResult { data ->
-            val edges = data.shows?.edges.asNotEmpty()
-                ?: return@mapResult DataRequestResult.Error(errorMessage = "Empty Result for getProgramsByStationId for station id <$stationId>")
+            val edges = data.shows?.edges.asNotEmpty() ?: return@mapResult DataRequestResult.Success(data = emptyList())
 
             return@mapResult edges
                 .mapNotNull { it?.toDomain() }

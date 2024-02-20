@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
@@ -47,7 +46,11 @@ class RadioStationsViewModel(
         favoriteRadioStationId: String?,
     ): RadioStationsUiState {
         return when (radioStationsResult) {
-            is DataRequestResult.Error -> RadioStationsUiState.Error(errorMessage = radioStationsResult.errorMessage ?: "Unknown Error")
+            is DataRequestResult.Error -> RadioStationsUiState.Error(
+                errorMessage = radioStationsResult.errorMessage ?: "Unknown Error",
+                onRetryClicked = ::startFetchingRadioStations,
+            )
+
             is DataRequestResult.Success -> RadioStationsUiState.Success(
                 stations = radioStationsResult.data
                     .mapIndexed { index, radioStation ->

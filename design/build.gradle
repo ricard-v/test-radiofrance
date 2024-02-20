@@ -58,6 +58,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling"
     debugImplementation "androidx.compose.ui:ui-test-manifest"
 
+    // Misc
+    implementation "com.airbnb.android:lottie-compose:6.3.0"
+
     // Tests
     // Tests > UI
     androidTestImplementation platform("androidx.compose:compose-bom:$androidx_compose_bom_version")

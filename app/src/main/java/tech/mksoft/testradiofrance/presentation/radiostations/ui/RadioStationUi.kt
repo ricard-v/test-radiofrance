@@ -23,7 +23,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.ImmutableList
 import org.koin.androidx.compose.koinViewModel
 import tech.mksoft.testradiofrance.R
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
@@ -59,7 +58,8 @@ fun RadioStationsUi() {
                         RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
                         is RadioStationsUiState.Error -> ErrorState(
                             message = currentState.errorMessage,
-                            modifier = Modifier.padding(contentPadding)
+                            modifier = Modifier.padding(contentPadding),
+                            doOnRetry = currentState.onRetryClicked,
                         )
 
                         is RadioStationsUiState.Success -> currentState.RadioStationsList(contentPadding = contentPadding)
