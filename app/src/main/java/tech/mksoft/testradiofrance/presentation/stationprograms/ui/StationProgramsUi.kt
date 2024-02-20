@@ -29,12 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import org.koin.androidx.compose.koinViewModel
-import tech.mksoft.testradiofrance.design.R
+import org.koin.core.parameter.parametersOf
 import tech.mksoft.testradiofrance.core.domain.model.StationProgram
+import tech.mksoft.testradiofrance.design.R
 import tech.mksoft.testradiofrance.design.components.AppScaffold
 import tech.mksoft.testradiofrance.design.components.ErrorState
 import tech.mksoft.testradiofrance.design.components.LoadingState
 import tech.mksoft.testradiofrance.design.components.NavigationAction
+import tech.mksoft.testradiofrance.design.components.RadioStationFavoriteButton
 import tech.mksoft.testradiofrance.design.components.StationProgramCard
 import tech.mksoft.testradiofrance.design.tools.plus
 import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsViewModel
@@ -42,8 +44,11 @@ import tech.mksoft.testradiofrance.presentation.stationprograms.model.LoadMorePr
 import tech.mksoft.testradiofrance.presentation.stationprograms.model.StationProgramsUiState
 
 @Composable
-fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
-    val viewModel = koinViewModel<StationProgramsViewModel>()
+fun StationProgramsUi(
+    stationId: String,
+    onBackArrowClicked: () -> Unit,
+) {
+    val viewModel = koinViewModel<StationProgramsViewModel>(parameters = { parametersOf(stationId) })
     val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     AppScaffold(
@@ -51,16 +56,21 @@ fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
         navigationAction = NavigationAction(
             icon = Icons.AutoMirrored.Outlined.ArrowBack,
             onClicked = onBackArrowClicked,
-        )
-    ) { contentPadding ->
-        (state as? StationProgramsUiState.Success)?.let {
-            StationProgramsList(
-                programs = it.programs,
-                loadMorePrograms = it.loadMorePrograms,
-                onRefreshRequested = { viewModel.fetchProgramsForStation(stationId) },
-                contentPadding = contentPadding,
+        ),
+        actions = {
+            RadioStationFavoriteButton(
+                isFavorite = state.isFavorite,
+                stationName = stationId,
+                onFavoriteClicked = {
+                    viewModel.onFavoriteActionClicked(stationId)
+                },
             )
-        } ?: run {
+        }
+    ) { contentPadding ->
+        (state as? StationProgramsUiState.Success)?.StationProgramsList(
+            onRefreshRequested = { viewModel.startFetchingStationPrograms() },
+            contentPadding = contentPadding,
+        ) ?: run {
             Crossfade(
                 targetState = state,
                 label = "StationProgramsUi - Cross Fade Animator",
@@ -69,7 +79,7 @@ fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
                     when (currentState) {
                         StationProgramsUiState.Empty -> {
                             LaunchedEffect(Unit) {
-                                viewModel.fetchProgramsForStation(stationId)
+                                viewModel.startFetchingStationPrograms()
                             }
                         }
 
@@ -82,10 +92,8 @@ fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
                             modifier = Modifier.padding(contentPadding),
                         )
 
-                        is StationProgramsUiState.Success -> StationProgramsList(
-                            programs = currentState.programs,
-                            loadMorePrograms = currentState.loadMorePrograms,
-                            onRefreshRequested = { viewModel.fetchProgramsForStation(stationId) },
+                        is StationProgramsUiState.Success -> currentState.StationProgramsList(
+                            onRefreshRequested = { viewModel.startFetchingStationPrograms() },
                             contentPadding = contentPadding,
                         )
                     }
@@ -96,9 +104,7 @@ fun StationProgramsUi(stationId: String, onBackArrowClicked: () -> Unit) {
 }
 
 @Composable
-private fun StationProgramsList(
-    programs: ImmutableList<StationProgram>,
-    loadMorePrograms: LoadMorePrograms?,
+private fun StationProgramsUiState.Success.StationProgramsList(
     onRefreshRequested: () -> Unit,
     contentPadding: PaddingValues,
 ) {

@@ -3,7 +3,6 @@
 package tech.mksoft.testradiofrance.presentation.radiostations.ui
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -26,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import tech.mksoft.testradiofrance.R
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
@@ -46,15 +43,7 @@ fun RadioStationsUi() {
     AppScaffold(
         pageTitle = stringResource(id = R.string.app_name),
     ) { contentPadding ->
-        (state as? RadioStationsUiState.Success)?.let {
-            RadioStationsList(
-                stations = it.stations,
-                onStationClicked = it.onStationClicked,
-                onFavoriteClicked = it.onFavoriteButtonClicked,
-                onRefreshRequested = { viewModel.fetchRadioStations() },
-                contentPadding = contentPadding,
-            )
-        } ?: run {
+        (state as? RadioStationsUiState.Success)?.RadioStationsList(contentPadding = contentPadding) ?: run {
             Crossfade(
                 targetState = state,
                 label = "RadioStationsUi - Cross Fade Animator",
@@ -64,18 +53,16 @@ fun RadioStationsUi() {
                 ) {
                     when (currentState) {
                         RadioStationsUiState.Empty -> LaunchedEffect(Unit) {
-                            viewModel.fetchRadioStations()
+                            viewModel.startFetchingRadioStations()
                         }
 
                         RadioStationsUiState.Loading -> LoadingState(modifier = Modifier.padding(contentPadding))
-                        is RadioStationsUiState.Error -> ErrorState(message = currentState.errorMessage, modifier = Modifier.padding(contentPadding))
-                        is RadioStationsUiState.Success -> RadioStationsList(
-                            stations = currentState.stations,
-                            onStationClicked = currentState.onStationClicked,
-                            onFavoriteClicked = currentState.onFavoriteButtonClicked,
-                            onRefreshRequested = { viewModel.fetchRadioStations() },
-                            contentPadding = contentPadding,
+                        is RadioStationsUiState.Error -> ErrorState(
+                            message = currentState.errorMessage,
+                            modifier = Modifier.padding(contentPadding)
                         )
+
+                        is RadioStationsUiState.Success -> currentState.RadioStationsList(contentPadding = contentPadding)
                     }
                 }
             }
@@ -84,17 +71,15 @@ fun RadioStationsUi() {
 }
 
 @Composable
-private fun RadioStationsList(
-    stations: ImmutableList<RadioStation>,
-    onStationClicked: (RadioStation) -> Unit,
-    onFavoriteClicked: (RadioStation) -> Unit,
-    onRefreshRequested: () -> Unit,
+private fun RadioStationsUiState.Success.RadioStationsList(
     contentPadding: PaddingValues,
 ) {
+    val viewModel = koinViewModel<RadioStationsViewModel>()
+
     val pullRefreshState = rememberPullToRefreshState()
     if (pullRefreshState.isRefreshing) {
         LaunchedEffect(Unit) {
-            onRefreshRequested.invoke()
+            viewModel.startFetchingRadioStations()
             pullRefreshState.endRefresh()
         }
     }
@@ -125,7 +110,7 @@ private fun RadioStationsList(
                         onStationClicked.invoke(stationItem)
                     },
                     onFavoriteClicked = {
-                        onFavoriteClicked.invoke(stationItem)
+                        onFavoriteButtonClicked.invoke(stationItem)
                     },
                     modifier = Modifier.animateItemPlacement(),
                 )

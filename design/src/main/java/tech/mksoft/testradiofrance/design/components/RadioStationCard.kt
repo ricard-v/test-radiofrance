@@ -11,11 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -58,7 +55,7 @@ fun RadioStationCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 StationName(name = radioStation.name)
-                FavoriteButton(
+                RadioStationFavoriteButton(
                     isFavorite = radioStation.isFavorite,
                     stationName = radioStation.name,
                     onFavoriteClicked = onFavoriteClicked,
@@ -87,30 +84,6 @@ private fun StationName(name: String) {
         text = name,
         style = Typography.titleMedium,
     )
-}
-
-@Composable
-private fun FavoriteButton(
-    isFavorite: Boolean,
-    stationName: String,
-    onFavoriteClicked: () -> Unit,
-) {
-    IconButton(
-        onClick = onFavoriteClicked,
-    ) {
-        if (isFavorite) {
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = stringResource(id = R.string.radio_station_favorite_button, stationName),
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = stringResource(id = R.string.radio_station_unfavorite_button, stationName),
-            )
-        }
-    }
-
 }
 
 @Composable

@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
 import tech.mksoft.testradiofrance.core.domain.model.RadioStation
@@ -26,22 +29,38 @@ class RadioStationsViewModel(
     private val _navigation: MutableSharedFlow<RadioStationNavigation> = MutableSharedFlow()
     val navigationDirection = _navigation.asSharedFlow()
 
-    private var positionBeforeFavorited: Int? = null
-
-    fun fetchRadioStations() {
+    fun startFetchingRadioStations() {
         viewModelScope.launch {
             _uiStateFlow.value = RadioStationsUiState.Loading
-            _uiStateFlow.value = when (val result = getRadioStationsUseCase.execute()) {
-                is DataRequestResult.Error -> RadioStationsUiState.Error(errorMessage = result.errorMessage ?: "Unknown Error")
-                is DataRequestResult.Success -> RadioStationsUiState.Success(
-                    stations = result.data
-                        .mapIndexed { index, radioStation -> radioStation.copy(position = index) } // mapping index to remember position as provided by BE services
-                        .sortWithFavorite()
-                        .toImmutableList(),
-                    onStationClicked = ::handleOnRadioStationClicked,
-                    onFavoriteButtonClicked = ::handleOnFavoriteButtonClicked,
-                )
+            combine(
+                getRadioStationsUseCase.getRadioStationsFlow(),
+                userPreferencesUseCase.getFavoriteRadioStation(),
+                transform = ::mapRadioStations,
+            ).collectLatest {
+                _uiStateFlow.value = it
             }
+        }
+    }
+
+    private fun mapRadioStations(
+        radioStationsResult: DataRequestResult<List<RadioStation>>,
+        favoriteRadioStationId: String?,
+    ): RadioStationsUiState {
+        return when (radioStationsResult) {
+            is DataRequestResult.Error -> RadioStationsUiState.Error(errorMessage = radioStationsResult.errorMessage ?: "Unknown Error")
+            is DataRequestResult.Success -> RadioStationsUiState.Success(
+                stations = radioStationsResult.data
+                    .mapIndexed { index, radioStation ->
+                        radioStation.copy(
+                            position = index,
+                            isFavorite = radioStation.id == favoriteRadioStationId,
+                        )
+                    } // mapping index to remember position as provided by BE services
+                    .sortWithFavorite()
+                    .toImmutableList(),
+                onStationClicked = ::handleOnRadioStationClicked,
+                onFavoriteButtonClicked = ::handleOnFavoriteButtonClicked,
+            )
         }
     }
 
@@ -53,17 +72,10 @@ class RadioStationsViewModel(
 
     private fun handleOnFavoriteButtonClicked(radioStation: RadioStation) {
         viewModelScope.launch {
-            userPreferencesUseCase.saveRadioStationAsFavorite(radioStation)
-            (_uiStateFlow.value as? RadioStationsUiState.Success)?.let { currentState ->
-                _uiStateFlow.value = currentState.copy(
-                    stations = currentState.stations.map { currentRadioStation ->
-                        if (currentRadioStation === radioStation) {
-                            currentRadioStation.copy(isFavorite = !radioStation.isFavorite)
-                        } else {
-                            currentRadioStation.copy(isFavorite = false)
-                        }
-                    }.sortWithFavorite().toImmutableList(),
-                )
+            if (radioStation.isFavorite) { // is now un-favorited
+                userPreferencesUseCase.unFavoriteRadioStation()
+            } else { // is now favorite
+                userPreferencesUseCase.setFavoriteRadioStation(radioStation)
             }
         }
     }

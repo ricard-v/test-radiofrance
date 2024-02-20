@@ -1,7 +1,18 @@
 package tech.mksoft.testradiofrance.core.data.source
 
-interface UserPreferencesSource {
-    fun <T> storeValue(value: T, key: String)
+import kotlinx.coroutines.flow.Flow
 
-    fun <T> getValue(key: String, defaultValue: T?): T?
+interface UserPreferencesSource {
+
+    // region Store Values
+    suspend fun storeStringValue(value: String, key: String)
+    // endregion Store Values
+
+    // region Get Values
+    suspend fun getStringValue(key: String): Flow<String?>
+    // endregion Get Values
+
+    // region Clear Values
+    suspend fun removeStringKey(key: String)
+    // endregion Clear Values
 }

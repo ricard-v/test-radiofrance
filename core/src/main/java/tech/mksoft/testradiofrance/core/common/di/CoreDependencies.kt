@@ -1,8 +1,10 @@
 package tech.mksoft.testradiofrance.core.common.di
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import tech.mksoft.testradiofrance.core.common.graphql.ApolloClientFactory
 import tech.mksoft.testradiofrance.core.data.local.UserPreferencesLocalSource
@@ -17,7 +19,7 @@ import tech.mksoft.testradiofrance.core.domain.usecase.UserPreferencesUseCase
 
 val coreModule = module {
     single { ApolloClientFactory.makeClient() }
-    single { provideSharedPreferences(get()) }
+    single<DataStore<Preferences>> { androidContext().dataStorePreferences }
 
     // region Data Sources
     factory<RadioStationsDataSource> { RadioStationsRemoteDataSource(get()) }
@@ -30,12 +32,10 @@ val coreModule = module {
     // endregion Repositories
 
     // region Use Cases
-    factory { GetRadioStationsUseCase(get(), get()) }
+    factory { GetRadioStationsUseCase(get()) }
     factory { GetStationsPrograms(get()) }
     factory { UserPreferencesUseCase(get()) }
     // endregion Use Cases
 }
 
-private fun provideSharedPreferences(context: Context): SharedPreferences {
-    return PreferenceManager.getDefaultSharedPreferences(context)
-}
+private val Context.dataStorePreferences: DataStore<Preferences> by preferencesDataStore(name = "main")

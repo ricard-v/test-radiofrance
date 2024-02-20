@@ -1,31 +1,30 @@
 package tech.mksoft.testradiofrance.core.data.local
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
+import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import tech.mksoft.testradiofrance.core.data.source.UserPreferencesSource
-import kotlin.reflect.KClass
 
-class UserPreferencesLocalSource(private val sharedPreferences: SharedPreferences): UserPreferencesSource {
-    override fun <T> storeValue(value: T, key: String) {
-        sharedPreferences.edit {
-            when (value) {
-                is Boolean -> putBoolean(key, value)
-                is Int -> putInt(key, value)
-                is String -> putString(key, value)
-                is Long -> putLong(key, value)
-                is Float -> putFloat(key, value)
-                else -> Unit // Unsupported
-            }
+class UserPreferencesLocalSource(private val dataStore: DataStore<Preferences>) : UserPreferencesSource {
+    override suspend fun storeStringValue(value: String, key: String) {
+        dataStore.edit { preferences ->
+            preferences[stringPreferencesKey(key)] = value
         }
     }
 
-    override fun <T> getValue(key: String, defaultValue: T?): T? {
-        return if (sharedPreferences.contains(key)) {
-            val value: Pair<String, Any?> = sharedPreferences.all.toList().first { it.first == key }
-            @Suppress("UNCHECKED_CAST")
-            (value.second as? T)
-        } else {
-            null
+    override suspend fun getStringValue(key: String): Flow<String?> {
+        return dataStore.data.map { preferences -> preferences[stringPreferencesKey(key)] }
+    }
+
+    override suspend fun removeStringKey(key: String) {
+        dataStore.edit { preferences ->
+            preferences.remove(stringPreferencesKey(key))
         }
     }
 }

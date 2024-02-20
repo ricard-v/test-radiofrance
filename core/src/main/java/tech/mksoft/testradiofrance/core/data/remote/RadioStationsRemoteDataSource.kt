@@ -3,6 +3,7 @@ package tech.mksoft.testradiofrance.core.data.remote
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import tech.mksoft.testradiofrance.core.BrandsQuery
 import tech.mksoft.testradiofrance.core.ShowsQuery
 import tech.mksoft.testradiofrance.core.common.DataRequestResult
@@ -17,11 +18,11 @@ import tech.mksoft.testradiofrance.core.domain.model.StationProgram
 import tech.mksoft.testradiofrance.core.type.StationsEnum
 
 class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : RadioStationsDataSource {
-    override suspend fun getAvailableStations(): DataRequestResult<List<RadioStation>> {
+    override suspend fun getAvailableStations(): Flow<DataRequestResult<List<RadioStation>>> {
         return safeApiCall {
             apolloClient
                 .query(BrandsQuery())
-                .execute()
+                .toFlow()
         } mapResult { data ->
             val brands = data.brands?.asNotEmpty()
                 ?: return@mapResult DataRequestResult.Error(errorMessage = "Empty Result for getAvailableStations")
@@ -34,7 +35,7 @@ class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : Ra
         }
     }
 
-    override suspend fun getProgramsByStationId(stationId: String, count: Int, fromCursor: String?): DataRequestResult<List<StationProgram>> {
+    override suspend fun getProgramsByStationId(stationId: String, count: Int, fromCursor: String?): Flow<DataRequestResult<List<StationProgram>>> {
         return safeApiCall {
             val stationEnumValue: StationsEnum = StationsEnum.valueOf(stationId)
             apolloClient
@@ -45,7 +46,7 @@ class RadioStationsRemoteDataSource(private val apolloClient: ApolloClient) : Ra
                         after = Optional.presentIfNotNull(fromCursor),
                     )
                 )
-                .execute()
+                .toFlow()
         } mapResult { data ->
             val edges = data.shows?.edges.asNotEmpty()
                 ?: return@mapResult DataRequestResult.Error(errorMessage = "Empty Result for getProgramsByStationId for station id <$stationId>")

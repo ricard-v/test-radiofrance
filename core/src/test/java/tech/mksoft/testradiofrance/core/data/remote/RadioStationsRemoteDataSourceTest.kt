@@ -7,13 +7,15 @@ import com.apollographql.apollo3.api.Optional
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import io.mockk.clearAllMocks
-import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import io.mockk.verify
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.AfterClass
@@ -39,17 +41,19 @@ class RadioStationsRemoteDataSourceTest {
         val expectedErrorMessage = "Internal Error"
 
         // GIVEN
-        coEvery { mockedApolloClient.query(BrandsQuery()) } returns mockk {
-            coEvery { execute() } throws ApolloHttpException(
-                message = expectedErrorMessage,
-                statusCode = 500,
-                headers = emptyList(),
-                body = null,
-            )
+        every { mockedApolloClient.query(BrandsQuery()) } returns mockk {
+            every { toFlow() } returns flow {
+                throw ApolloHttpException(
+                    message = expectedErrorMessage,
+                    statusCode = 500,
+                    headers = emptyList(),
+                    body = null,
+                )
+            }
         }
 
         // WHEN
-        val result = systemUnderTest.getAvailableStations()
+        val result = systemUnderTest.getAvailableStations().first()
 
         // THEN
         assertIs<DataRequestResult.Error>(result).run {
@@ -57,7 +61,7 @@ class RadioStationsRemoteDataSourceTest {
             assertEquals(expectedErrorMessage, errorMessage)
         }
 
-        coVerify(exactly = 1) { mockedApolloClient.query(BrandsQuery()) }
+        verify(exactly = 1) { mockedApolloClient.query(BrandsQuery()) }
     }
 
     @Test
@@ -65,12 +69,14 @@ class RadioStationsRemoteDataSourceTest {
         val expectedErrorMessage = "Missing internet access"
 
         // GIVEN
-        coEvery { mockedApolloClient.query(BrandsQuery()) } returns mockk {
-            coEvery { execute() } throws ApolloNetworkException(message = expectedErrorMessage)
+        every { mockedApolloClient.query(BrandsQuery()) } returns mockk {
+            every { toFlow() } returns flow {
+                throw ApolloNetworkException(message = expectedErrorMessage)
+            }
         }
 
         // WHEN
-        val result = systemUnderTest.getAvailableStations()
+        val result = systemUnderTest.getAvailableStations().first()
 
         // THEN
         assertIs<DataRequestResult.Error>(result).run {
@@ -78,7 +84,7 @@ class RadioStationsRemoteDataSourceTest {
             assertEquals(expectedErrorMessage, errorMessage)
         }
 
-        coVerify(exactly = 1) { mockedApolloClient.query(BrandsQuery()) }
+        verify(exactly = 1) { mockedApolloClient.query(BrandsQuery()) }
     }
 
     @Test
@@ -98,13 +104,13 @@ class RadioStationsRemoteDataSourceTest {
         )
 
         val mockedQuery: ApolloCall<BrandsQuery.Data> = mockk {
-            coEvery { execute() } returns mockedApolloResponse
+            every { toFlow() } returns flowOf(mockedApolloResponse)
         }
 
-        coEvery { mockedApolloClient.query(BrandsQuery()) } returns mockedQuery
+        every { mockedApolloClient.query(BrandsQuery()) } returns mockedQuery
 
         // WHEN
-        val result = systemUnderTest.getAvailableStations()
+        val result = systemUnderTest.getAvailableStations().first()
 
         // THEN
         assertIs<DataRequestResult.Success<List<RadioStation>>>(result).run {
@@ -115,7 +121,7 @@ class RadioStationsRemoteDataSourceTest {
             assertEquals(sampleBrand.description, station.description)
         }
 
-        coVerify(exactly = 1) { mockedApolloClient.query(BrandsQuery()) }
+        verify(exactly = 1) { mockedApolloClient.query(BrandsQuery()) }
     }
     // endregion getAvailableStations() Tests
 
@@ -126,7 +132,7 @@ class RadioStationsRemoteDataSourceTest {
         val expectedErrorMessage = "Internal Error"
 
         // GIVEN
-        coEvery {
+        every {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -135,16 +141,18 @@ class RadioStationsRemoteDataSourceTest {
                 ),
             )
         } returns mockk {
-            coEvery { execute() } throws ApolloHttpException(
-                message = expectedErrorMessage,
-                statusCode = 500,
-                headers = emptyList(),
-                body = null,
-            )
+            every { toFlow() } returns flow {
+                throw ApolloHttpException(
+                    message = expectedErrorMessage,
+                    statusCode = 500,
+                    headers = emptyList(),
+                    body = null,
+                )
+            }
         }
 
         // WHEN
-        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null)
+        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null).first()
 
         // THEN
         assertIs<DataRequestResult.Error>(result).run {
@@ -152,7 +160,7 @@ class RadioStationsRemoteDataSourceTest {
             assertEquals(expectedErrorMessage, errorMessage)
         }
 
-        coVerify(exactly = 1) {
+        verify(exactly = 1) {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -169,7 +177,7 @@ class RadioStationsRemoteDataSourceTest {
         val expectedErrorMessage = "Missing internet access"
 
         // GIVEN
-        coEvery {
+        every {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -178,11 +186,13 @@ class RadioStationsRemoteDataSourceTest {
                 ),
             )
         } returns mockk {
-            coEvery { execute() } throws ApolloNetworkException(message = expectedErrorMessage)
+            every { toFlow() } returns flow {
+                throw ApolloNetworkException(message = expectedErrorMessage)
+            }
         }
 
         // WHEN
-        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null)
+        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null).first()
 
         // THEN
         assertIs<DataRequestResult.Error>(result).run {
@@ -190,7 +200,7 @@ class RadioStationsRemoteDataSourceTest {
             assertEquals(expectedErrorMessage, errorMessage)
         }
 
-        coVerify(exactly = 1) {
+        verify(exactly = 1) {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -231,10 +241,10 @@ class RadioStationsRemoteDataSourceTest {
         )
 
         val mockedQuery: ApolloCall<ShowsQuery.Data> = mockk {
-            coEvery { execute() } returns mockedApolloResponse
+            every { toFlow() } returns flowOf(mockedApolloResponse)
         }
 
-        coEvery {
+        every {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -245,7 +255,7 @@ class RadioStationsRemoteDataSourceTest {
         } returns mockedQuery
 
         // WHEN
-        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null)
+        val result = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 10, fromCursor = null).first()
 
         // THEN
         assertIs<DataRequestResult.Success<List<StationProgram>>>(result).run {
@@ -259,7 +269,7 @@ class RadioStationsRemoteDataSourceTest {
             }
         }
 
-        coVerify(exactly = 1) {
+        verify(exactly = 1) {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -295,20 +305,15 @@ class RadioStationsRemoteDataSourceTest {
         // GIVEN
         val mockedApolloResponse: ApolloResponse<ShowsQuery.Data> = mockk()
         every { mockedApolloResponse.hasErrors() } returns false
-        every { mockedApolloResponse.getData() } returnsMany listOf(
-            ShowsQuery.Data(
-                shows = ShowsQuery.Shows(edges = sampleEdges.take(1))
-            ),
-            ShowsQuery.Data(
-                shows = ShowsQuery.Shows(edges = sampleEdges.subList(1, 2))
-            ),
+        every { mockedApolloResponse.getData() } returns ShowsQuery.Data(
+            shows = ShowsQuery.Shows(edges = sampleEdges.take(1))
         )
 
-        val mockedQuery: ApolloCall<ShowsQuery.Data> = mockk {
-            coEvery { execute() } returns mockedApolloResponse
+        val mockedQuery1: ApolloCall<ShowsQuery.Data> = mockk {
+            every { toFlow() } returns flowOf(mockedApolloResponse)
         }
 
-        coEvery {
+        every {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -316,9 +321,20 @@ class RadioStationsRemoteDataSourceTest {
                     after = Optional.presentIfNotNull(null),
                 ),
             )
-        } returns mockedQuery
+        } returns mockedQuery1
 
-        coEvery {
+        // initial load request
+        systemUnderTest.getProgramsByStationId(stationId = stationId, count = 1, fromCursor = null)
+
+        every { mockedApolloResponse.getData() } returns ShowsQuery.Data(
+            shows = ShowsQuery.Shows(edges = sampleEdges.subList(1, 2))
+        )
+
+        val mockedQuery2: ApolloCall<ShowsQuery.Data> = mockk {
+            every { toFlow() } returns flowOf(mockedApolloResponse)
+        }
+
+        every {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -326,12 +342,10 @@ class RadioStationsRemoteDataSourceTest {
                     after = Optional.presentIfNotNull(sampleEdges[1].cursor),
                 ),
             )
-        } returns mockedQuery
+        } returns mockedQuery2
 
-        systemUnderTest.getProgramsByStationId(stationId = stationId, count = 1, fromCursor = null)
-
-        // WHEN
-        val loadMoreResult = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 1, fromCursor = sampleEdges[1].cursor)
+        // WHEN (load more request)
+        val loadMoreResult = systemUnderTest.getProgramsByStationId(stationId = stationId, count = 1, fromCursor = sampleEdges[1].cursor).first()
 
         // THEN
         assertIs<DataRequestResult.Success<List<StationProgram>>>(loadMoreResult).run {
@@ -343,7 +357,7 @@ class RadioStationsRemoteDataSourceTest {
             assertEquals(expected.node!!.standFirst, actual.description)
         }
 
-        coVerify(exactly = 1) {
+        verify(exactly = 1) {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,
@@ -353,7 +367,7 @@ class RadioStationsRemoteDataSourceTest {
             )
         }
 
-        coVerify(exactly = 1) {
+        verify(exactly = 1) {
             mockedApolloClient.query(
                 ShowsQuery(
                     station = StationsEnum.FRANCEINFO,

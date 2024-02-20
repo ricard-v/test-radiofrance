@@ -3,7 +3,10 @@ package tech.mksoft.testradiofrance.core.data.repository
 import tech.mksoft.testradiofrance.core.data.source.UserPreferencesSource
 
 class UserPreferencesRepository(private val userPreferencesSource: UserPreferencesSource) {
-    fun <T> storePreference(value: T, key: String) = userPreferencesSource.storeValue(value, key)
 
-    fun <T> getPreference(key: String, defaultValue: T? = null) = userPreferencesSource.getValue(key, defaultValue)
+    suspend fun storeStringPreference(key: String, value: String) = userPreferencesSource.storeStringValue(value, key)
+
+    suspend fun getStringPreference(key: String) = userPreferencesSource.getStringValue(key)
+
+    suspend fun removeStringPreference (key: String) = userPreferencesSource.removeStringKey(key)
 }

@@ -5,12 +5,17 @@ import tech.mksoft.testradiofrance.core.domain.model.RadioStation
 
 class UserPreferencesUseCase(private val userPreferencesRepository: UserPreferencesRepository) {
 
-    fun saveRadioStationAsFavorite(radioStation: RadioStation) {
-        userPreferencesRepository.storePreference(value = radioStation.id, KEY_FAVORITE_STATION)
+    suspend fun setFavoriteRadioStation(radioStation: RadioStation) {
+        setFavoriteRadioStation(stationId = radioStation.id)
     }
 
-    fun getFavoriteRadioStationId() : String? {
-        return userPreferencesRepository.getPreference(key = KEY_FAVORITE_STATION)
+    suspend fun setFavoriteRadioStation(stationId: String) {
+        userPreferencesRepository.storeStringPreference(key = KEY_FAVORITE_STATION, value = stationId)
+    }
+    suspend fun getFavoriteRadioStation() = userPreferencesRepository.getStringPreference(key = KEY_FAVORITE_STATION)
+
+    suspend fun unFavoriteRadioStation() {
+        userPreferencesRepository.removeStringPreference(key = KEY_FAVORITE_STATION)
     }
 
     private companion object {
