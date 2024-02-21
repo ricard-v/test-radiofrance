@@ -2,7 +2,6 @@
 
 package tech.mksoft.testradiofrance.presentation.stationprograms.ui
 
-import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,13 +31,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.compose.navigation.koinNavViewModel
-import org.koin.compose.currentKoinScope
 import org.koin.core.parameter.parametersOf
-import tech.mksoft.testradiofrance.MainViewModel
 import tech.mksoft.testradiofrance.core.domain.model.StationProgram
 import tech.mksoft.testradiofrance.design.R
 import tech.mksoft.testradiofrance.design.components.AppScaffold

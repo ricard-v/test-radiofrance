@@ -2,7 +2,6 @@ package tech.mksoft.testradiofrance.core.data.remote
 
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import tech.mksoft.testradiofrance.core.BrandsQuery
 import tech.mksoft.testradiofrance.core.ShowsQuery
