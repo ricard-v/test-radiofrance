@@ -8,5 +8,5 @@ class UserPreferencesRepository(private val userPreferencesSource: UserPreferenc
 
     suspend fun getStringPreference(key: String) = userPreferencesSource.getStringValue(key)
 
-    suspend fun removeStringPreference (key: String) = userPreferencesSource.removeStringKey(key)
+    suspend fun removeStringPreference(key: String) = userPreferencesSource.removeStringKey(key)
 }

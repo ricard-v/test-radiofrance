@@ -12,6 +12,7 @@ class UserPreferencesUseCase(private val userPreferencesRepository: UserPreferen
     suspend fun setFavoriteRadioStation(stationId: String) {
         userPreferencesRepository.storeStringPreference(key = KEY_FAVORITE_STATION, value = stationId)
     }
+
     suspend fun getFavoriteRadioStation() = userPreferencesRepository.getStringPreference(key = KEY_FAVORITE_STATION)
 
     suspend fun unFavoriteRadioStation() {

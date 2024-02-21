@@ -61,7 +61,8 @@ private fun BoxScope.LivePlayerUi() {
     AnimatedVisibility(
         visible = uiState?.showPlayerBanner == true,
         enter = slideInVertically(
-            initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = animationDuration)),
+            initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = animationDuration)
+        ),
         exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = animationDuration)),
         modifier = Modifier
             .fillMaxWidth()
