@@ -28,7 +28,6 @@ fun SetupAppNavigation() {
         NavHost(
             navController = navController,
             startDestination = RadioStationRouteNavigation.routeName,
-            route = "root"
         ) {
             composable(
                 route = RadioStationRouteNavigation.routeName
