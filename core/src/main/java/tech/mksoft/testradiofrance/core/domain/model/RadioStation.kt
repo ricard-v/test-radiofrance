@@ -6,6 +6,5 @@ data class RadioStation(
     val pitch: String?,
     val description: String?,
     val liveStreamUrl: String?,
-    val isFavorite: Boolean = false,
     val position: Int = 0,
 )

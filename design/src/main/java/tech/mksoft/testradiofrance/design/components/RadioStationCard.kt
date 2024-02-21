@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +42,8 @@ fun RadioStationCard(
     onSeeAllProgramsClicked: () -> Unit,
     onFavoriteClicked: () -> Unit,
     onPlayLiveStreamClicked: (() -> Unit)?,
+    isFavorite: Boolean,
+    isPlaying: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier) {
@@ -60,7 +64,7 @@ fun RadioStationCard(
             ) {
                 StationName(name = radioStation.name)
                 RadioStationFavoriteButton(
-                    isFavorite = radioStation.isFavorite,
+                    isFavorite = isFavorite,
                     stationName = radioStation.name,
                     onFavoriteClicked = onFavoriteClicked,
                 )
@@ -83,7 +87,7 @@ fun RadioStationCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    PlayLiveStreamButton(onClicked = onPlayLiveStreamClicked, stationName = radioStation.name)
+                    PlayLiveStreamButton(onClicked = onPlayLiveStreamClicked, stationName = radioStation.name, isPlaying = isPlaying)
                     SeeAllProgramsButton(onClicked = onSeeAllProgramsClicked)
                 }
             } ?: run {
@@ -122,12 +126,19 @@ private fun StationDescription(description: String) {
 @Composable
 private fun PlayLiveStreamButton(
     stationName: String,
+    isPlaying: Boolean,
     onClicked: () -> Unit,
 ) {
     IconButton(onClick = onClicked) {
+        val (icon, contentDescription) = if (isPlaying) {
+            Icons.Filled.Stop to stringResource(id = R.string.radio_station_stop_livestream_button, stationName)
+        } else {
+            Icons.Filled.PlayArrow to stringResource(id = R.string.radio_station_play_livestream_button, stationName)
+        }
+
         Icon(
-            imageVector = Icons.Default.PlayArrow,
-            contentDescription = stringResource(id = R.string.radio_station_play_livestream_button, stationName)
+            imageVector = icon,
+            contentDescription = contentDescription,
         )
     }
 }
@@ -151,6 +162,9 @@ private fun MakePreviewFullContent() {
     var isFavorite by remember {
         mutableStateOf(false)
     }
+    var isPlaying by remember {
+        mutableStateOf(false)
+    }
 
     TestRadioFranceTheme {
         RadioStationCard(
@@ -160,13 +174,12 @@ private fun MakePreviewFullContent() {
                 pitch = "Et tout est plus clair",
                 description = "L'actualité en direct et en continu avec le média global du service public",
                 liveStreamUrl = "https://icecast.radiofrance.fr/franceinter-midfi.mp3?id=openapi",
-                isFavorite = isFavorite,
             ),
             onSeeAllProgramsClicked = {}, // nothing to do here
-            onPlayLiveStreamClicked = {}, // nothing to do here
-            onFavoriteClicked = {
-                isFavorite = !isFavorite
-            }
+            onPlayLiveStreamClicked = { isPlaying = !isPlaying },
+            isFavorite = isFavorite,
+            isPlaying = isPlaying,
+            onFavoriteClicked = { isFavorite = !isFavorite }
         )
     }
 }
@@ -186,13 +199,12 @@ private fun MakePreviewMissingSomeContent() {
                 pitch = null,
                 description = null,
                 liveStreamUrl = null,
-                isFavorite = isFavorite,
             ),
             onSeeAllProgramsClicked = {}, // nothing to do here
             onPlayLiveStreamClicked = null,
-            onFavoriteClicked = {
-                isFavorite = !isFavorite
-            }
+            isFavorite = isFavorite,
+            isPlaying = false,
+            onFavoriteClicked = { isFavorite = !isFavorite },
         )
     }
 }

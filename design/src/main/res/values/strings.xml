@@ -5,6 +5,7 @@
     <string name="radio_station_favorite_button">Mark <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g> station as favorite</string>
     <string name="radio_station_unfavorite_button">Unmark <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g> station as favorite</string>
     <string name="radio_station_play_livestream_button">Play the livestream for <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g></string>
+    <string name="radio_station_stop_livestream_button">Stop the livestream of <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g></string>
     <!-- endregion Radio Stations -->
 
     <!-- region Station Programs -->

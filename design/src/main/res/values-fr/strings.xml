@@ -12,4 +12,5 @@
     <string name="live_player_pause_play_button">Interrompte le direct</string>
     <string name="live_player_stop_play_button">Mettre fin au direct</string>
     <string name="live_player_playing_station_label">Vous êtes en train d\'écouter le direct de %1$s</string>
+    <string name="radio_station_stop_livestream_button">Arrêter d\'écouter le direct de %1$s</string>
 </resources>
