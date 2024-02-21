@@ -19,7 +19,7 @@ import tech.mksoft.testradiofrance.design.components.MediaButton.STOP
 import tech.mksoft.testradiofrance.services.media.RadioMediaPlayer
 
 class MainViewModel(private val radioMediaPlayer: RadioMediaPlayer) : ViewModel() {
-    private val _uiStateFlow: MutableStateFlow<MainUiState> = MutableStateFlow(MainUiState.Empty)
+    private val _uiStateFlow: MutableStateFlow<MainUiState?> = MutableStateFlow(null)
     val uiStateFlow = _uiStateFlow.asStateFlow()
 
     init {
@@ -27,15 +27,17 @@ class MainViewModel(private val radioMediaPlayer: RadioMediaPlayer) : ViewModel(
             radioMediaPlayer.livePlayerFlow.mapNotNull { livePlayer ->
                 if (livePlayer == null) return@mapNotNull null
 
-                when (val playerState = livePlayer.livePlayerState) {
-                    INITIALIZING, READY, PLAYING, PAUSED -> MainUiState.LivePlayer(
-                        playerState = playerState,
-                        playingStation = livePlayer.radioStation,
-                        onMediaButtonClicked = ::handleOnMediaButtonClicked,
-                    )
+                val playerState = livePlayer.livePlayerState
 
-                    else -> MainUiState.Empty
-                }
+                return@mapNotNull MainUiState(
+                    playerState = playerState,
+                    playingStation = livePlayer.radioStation,
+                    onMediaButtonClicked = ::handleOnMediaButtonClicked,
+                    showPlayerBanner = when (playerState) {
+                        INITIALIZING, READY, PLAYING, PAUSED -> true
+                        else -> false
+                    }
+                )
             }.collectLatest {
                 _uiStateFlow.value = it
             }
@@ -59,12 +61,9 @@ class MainViewModel(private val radioMediaPlayer: RadioMediaPlayer) : ViewModel(
     }
 }
 
-sealed class MainUiState {
-    data class LivePlayer(
-        val playerState: LivePlayerState,
-        val playingStation: RadioStation,
-        val onMediaButtonClicked: (MediaButton) -> Unit,
-    ) : MainUiState()
-
-    data object Empty : MainUiState()
-}
+data class MainUiState(
+    val playerState: LivePlayerState,
+    val playingStation: RadioStation,
+    val onMediaButtonClicked: (MediaButton) -> Unit,
+    val showPlayerBanner: Boolean,
+)

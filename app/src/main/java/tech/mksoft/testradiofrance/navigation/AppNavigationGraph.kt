@@ -28,7 +28,7 @@ fun SetupAppNavigation() {
     val mainViewModel = koinViewModel<MainViewModel>()
 
     val mainUiState by mainViewModel.uiStateFlow.collectAsState()
-    CompositionLocalProvider(LocalLivePlayerPlaying provides if (mainUiState is MainUiState.LivePlayer) PLAYER_HEIGHT.dp else 0.dp) {
+    CompositionLocalProvider(LocalLivePlayerPlaying provides if (mainUiState?.showPlayerBanner == true) PLAYER_HEIGHT.dp else 0.dp) {
         NavHost(
             navController = navController,
             startDestination = RadioStationRouteNavigation.routeName,

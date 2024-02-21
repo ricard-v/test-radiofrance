@@ -36,6 +36,16 @@ class RadioMediaPlayer(private val exoPlayer: ExoPlayer) {
                     }
                 }
             }
+
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                super.onPlayWhenReadyChanged(playWhenReady, reason)
+                currentlyPlayingStation?.let { station ->
+                    _livePlayerFlow.value = LivePlayer(
+                        radioStation = station,
+                        livePlayerState = if (playWhenReady) LivePlayerState.PLAYING else LivePlayerState.PAUSED,
+                    )
+                }
+            }
         })
     }
 
