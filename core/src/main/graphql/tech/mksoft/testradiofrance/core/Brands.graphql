@@ -4,5 +4,6 @@ query Brands {
         title
         baseline
         description
+        liveStream
     }
 }

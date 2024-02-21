@@ -7,4 +7,9 @@
     <string name="error_state_retry_button">Essayer à nouveau</string>
     <string name="station_programs_cannot_load_more_programs_label">Plus de programmes disponibles pour cette station</string>
     <string name="station_programs_cannot_load_more_programs_button">Revenir en haut</string>
+    <string name="radio_station_play_livestream_button">Écouter le direct de %1$s</string>
+    <string name="live_player_resume_play_button">Reprendre le direct</string>
+    <string name="live_player_pause_play_button">Interrompte le direct</string>
+    <string name="live_player_stop_play_button">Mettre fin au direct</string>
+    <string name="live_player_playing_station_label">Vous êtes en train d\'écouter le direct de %1$s</string>
 </resources>

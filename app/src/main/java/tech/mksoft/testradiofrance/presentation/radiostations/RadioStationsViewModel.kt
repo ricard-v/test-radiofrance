@@ -1,5 +1,6 @@
 package tech.mksoft.testradiofrance.presentation.radiostations
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
@@ -17,10 +18,12 @@ import tech.mksoft.testradiofrance.core.domain.usecase.UserPreferencesUseCase
 import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationNavigation
 import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationsUiState
 import tech.mksoft.testradiofrance.presentation.radiostations.model.ShowProgramsForStation
+import tech.mksoft.testradiofrance.services.media.RadioMediaPlayer
 
 class RadioStationsViewModel(
     private val getRadioStationsUseCase: GetRadioStationsUseCase,
     private val userPreferencesUseCase: UserPreferencesUseCase,
+    private val radioMediaPlayer: RadioMediaPlayer,
 ) : ViewModel() {
     private val _uiStateFlow: MutableStateFlow<RadioStationsUiState> = MutableStateFlow(RadioStationsUiState.Empty)
     val uiStateFlow = _uiStateFlow.asStateFlow()
@@ -81,6 +84,10 @@ class RadioStationsViewModel(
                 userPreferencesUseCase.setFavoriteRadioStation(radioStation)
             }
         }
+    }
+
+    fun startPlaying(radioStation: RadioStation) {
+        radioMediaPlayer.playLiveStreamFor(radioStation)
     }
 }
 

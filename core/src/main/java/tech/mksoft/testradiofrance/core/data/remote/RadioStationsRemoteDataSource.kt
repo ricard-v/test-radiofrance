@@ -64,6 +64,7 @@ private fun BrandsQuery.Brand.toDomain(): RadioStation = RadioStation(
     name = this.title,
     pitch = this.baseline.nullIfEmpty(),
     description = this.description.nullIfEmpty(),
+    liveStreamUrl = this.liveStream,
 )
 
 private fun ShowsQuery.Edge.toDomain(): StationProgram? {

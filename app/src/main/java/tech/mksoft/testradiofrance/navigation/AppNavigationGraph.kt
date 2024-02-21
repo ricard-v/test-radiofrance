@@ -1,10 +1,22 @@
 package tech.mksoft.testradiofrance.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.compose.navigation.koinNavViewModel
+import tech.mksoft.testradiofrance.MainUiState
+import tech.mksoft.testradiofrance.MainViewModel
+import tech.mksoft.testradiofrance.design.components.LocalLivePlayerPlaying
+import tech.mksoft.testradiofrance.design.components.PLAYER_HEIGHT
 import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationRoute
 import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationRouteNavigation
 import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsRoute
@@ -13,24 +25,30 @@ import tech.mksoft.testradiofrance.presentation.stationprograms.StationProgramsR
 @Composable
 fun SetupAppNavigation() {
     val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = RadioStationRouteNavigation.routeName,
-    ) {
-        composable(
-            route = RadioStationRouteNavigation.routeName
-        ) {
-            RadioStationRoute(navHostController = navController)
-        }
+    val mainViewModel = koinViewModel<MainViewModel>()
 
-        composable(
-            route = StationProgramsRouteNavigation.routeName,
-            arguments = StationProgramsRouteNavigation.navArguments,
+    val mainUiState by mainViewModel.uiStateFlow.collectAsState()
+    CompositionLocalProvider(LocalLivePlayerPlaying provides if (mainUiState is MainUiState.LivePlayer) PLAYER_HEIGHT.dp else 0.dp) {
+        NavHost(
+            navController = navController,
+            startDestination = RadioStationRouteNavigation.routeName,
+            route = "root"
         ) {
-            StationProgramsRoute(
-                navHostController = navController,
-                arguments = it.arguments,
-            )
+            composable(
+                route = RadioStationRouteNavigation.routeName
+            ) {
+                RadioStationRoute(navHostController = navController)
+            }
+
+            composable(
+                route = StationProgramsRouteNavigation.routeName,
+                arguments = StationProgramsRouteNavigation.navArguments,
+            ) {
+                StationProgramsRoute(
+                    navHostController = navController,
+                    arguments = it.arguments,
+                )
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ import tech.mksoft.testradiofrance.presentation.tools.testAndCancel
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class RadioStationViewModelTest: BaseTestClass() {
+class RadioStationViewModelTest : BaseTestClass() {
 
     private val systemUnderTest = RadioStationsViewModel(mockedGetRadioStationsUseCase)
 
@@ -97,7 +97,8 @@ class RadioStationViewModelTest: BaseTestClass() {
             id = "id",
             name = "France Info",
             pitch = "La meilleure radio au monde ?",
-            description = "Il faut écouter pour y croire ;-)"
+            description = "Il faut écouter pour y croire ;-)",
+            liveStreamUrl = "https://icecast.radiofrance.fr/franceinter-midfi.mp3?id=openapi",
         )
 
         @JvmStatic

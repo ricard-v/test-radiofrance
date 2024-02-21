@@ -4,6 +4,7 @@
     <string name="radio_station_see_all_programs_button">See all programs</string>
     <string name="radio_station_favorite_button">Mark <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g> station as favorite</string>
     <string name="radio_station_unfavorite_button">Unmark <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g> station as favorite</string>
+    <string name="radio_station_play_livestream_button">Play the livestream for <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g></string>
     <!-- endregion Radio Stations -->
 
     <!-- region Station Programs -->
@@ -11,6 +12,13 @@
     <string name="station_programs_cannot_load_more_programs_label">No more programs available for that station</string>
     <string name="station_programs_cannot_load_more_programs_button">Scroll to top</string>
     <!-- endregion Station Programs -->
+
+    <!-- region Live Player -->
+    <string name="live_player_playing_station_label">You are listening to the livestream of <xliff:g example="Franceinfo" id="station_name">%1%s€</xliff:g></string>
+    <string name="live_player_stop_play_button">Stop live stream</string>
+    <string name="live_player_resume_play_button">Resume live stream</string>
+    <string name="live_player_pause_play_button">Pause live stream</string>
+    <!-- endregion Live Player -->
 
     <!-- region Misc -->
     <string name="error_state_retry_button">Retry</string>

@@ -104,6 +104,10 @@ private fun RadioStationsUiState.Success.RadioStationsList(
                 items = stations,
                 key = { stationItem -> stationItem.name },
             ) { stationItem: RadioStation ->
+                val onPlayLiveStreamClicked = stationItem.liveStreamUrl?.let { {
+                    viewModel.startPlaying(stationItem)
+                } }
+
                 RadioStationCard(
                     radioStation = stationItem,
                     onSeeAllProgramsClicked = {
@@ -112,6 +116,7 @@ private fun RadioStationsUiState.Success.RadioStationsList(
                     onFavoriteClicked = {
                         onFavoriteButtonClicked.invoke(stationItem)
                     },
+                    onPlayLiveStreamClicked = onPlayLiveStreamClicked,
                     modifier = Modifier.animateItemPlacement(),
                 )
             }
