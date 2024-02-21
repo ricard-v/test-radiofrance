@@ -94,6 +94,7 @@ class RadioStationsRemoteDataSourceTest {
             title = "title",
             baseline = "baseline",
             description = "description",
+            liveStream = "livestream-url"
         )
 
         // GIVEN

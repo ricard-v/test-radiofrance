@@ -2,7 +2,6 @@ package tech.mksoft.testradiofrance.design.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,8 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +38,9 @@ fun RadioStationCard(
     radioStation: RadioStation,
     onSeeAllProgramsClicked: () -> Unit,
     onFavoriteClicked: () -> Unit,
+    onPlayLiveStreamClicked: (() -> Unit)?,
+    isFavorite: Boolean,
+    isPlaying: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier) {
@@ -56,7 +61,7 @@ fun RadioStationCard(
             ) {
                 StationName(name = radioStation.name)
                 RadioStationFavoriteButton(
-                    isFavorite = radioStation.isFavorite,
+                    isFavorite = isFavorite,
                     stationName = radioStation.name,
                     onFavoriteClicked = onFavoriteClicked,
                 )
@@ -73,7 +78,19 @@ fun RadioStationCard(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            SeeAllProgramsButton(onClicked = onSeeAllProgramsClicked)
+            onPlayLiveStreamClicked?.let {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    PlayLiveStreamButton(onClicked = onPlayLiveStreamClicked, stationName = radioStation.name, isPlaying = isPlaying)
+                    SeeAllProgramsButton(onClicked = onSeeAllProgramsClicked)
+                }
+            } ?: run {
+                SeeAllProgramsButton(onClicked = onSeeAllProgramsClicked, modifier = Modifier.align(Alignment.End))
+            }
+
         }
     }
 }
@@ -104,10 +121,30 @@ private fun StationDescription(description: String) {
 }
 
 @Composable
-private fun ColumnScope.SeeAllProgramsButton(onClicked: () -> Unit) {
+private fun PlayLiveStreamButton(
+    stationName: String,
+    isPlaying: Boolean,
+    onClicked: () -> Unit,
+) {
+    IconButton(onClick = onClicked) {
+        val (icon, contentDescription) = if (isPlaying) {
+            Icons.Filled.Stop to stringResource(id = R.string.radio_station_stop_livestream_button, stationName)
+        } else {
+            Icons.Filled.PlayArrow to stringResource(id = R.string.radio_station_play_livestream_button, stationName)
+        }
+
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+        )
+    }
+}
+
+@Composable
+private fun SeeAllProgramsButton(onClicked: () -> Unit, modifier: Modifier = Modifier) {
     TextButton(
         onClick = onClicked,
-        modifier = Modifier.align(Alignment.End),
+        modifier = modifier,
     ) {
         Text(text = stringResource(id = R.string.radio_station_see_all_programs_button))
         Spacer(modifier = Modifier.width(8.dp))
@@ -122,6 +159,9 @@ private fun MakePreviewFullContent() {
     var isFavorite by remember {
         mutableStateOf(false)
     }
+    var isPlaying by remember {
+        mutableStateOf(false)
+    }
 
     TestRadioFranceTheme {
         RadioStationCard(
@@ -130,19 +170,20 @@ private fun MakePreviewFullContent() {
                 name = "franceinfo",
                 pitch = "Et tout est plus clair",
                 description = "L'actualité en direct et en continu avec le média global du service public",
-                isFavorite = isFavorite,
+                liveStreamUrl = "https://icecast.radiofrance.fr/franceinter-midfi.mp3?id=openapi",
             ),
             onSeeAllProgramsClicked = {}, // nothing to do here
-            onFavoriteClicked = {
-                isFavorite = !isFavorite
-            }
+            onPlayLiveStreamClicked = { isPlaying = !isPlaying },
+            isFavorite = isFavorite,
+            isPlaying = isPlaying,
+            onFavoriteClicked = { isFavorite = !isFavorite }
         )
     }
 }
 
 @PreviewLightDark
 @Composable
-private fun MakePreviewMisingSomeContent() {
+private fun MakePreviewMissingSomeContent() {
     var isFavorite by remember {
         mutableStateOf(false)
     }
@@ -154,12 +195,13 @@ private fun MakePreviewMisingSomeContent() {
                 name = "franceinfo",
                 pitch = null,
                 description = null,
-                isFavorite = isFavorite,
+                liveStreamUrl = null,
             ),
             onSeeAllProgramsClicked = {}, // nothing to do here
-            onFavoriteClicked = {
-                isFavorite = !isFavorite
-            }
+            onPlayLiveStreamClicked = null,
+            isFavorite = isFavorite,
+            isPlaying = false,
+            onFavoriteClicked = { isFavorite = !isFavorite },
         )
     }
 }

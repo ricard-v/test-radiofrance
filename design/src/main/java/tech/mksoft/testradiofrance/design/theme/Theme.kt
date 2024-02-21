@@ -35,7 +35,7 @@ fun TestRadioFranceTheme(
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
-    
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !view.isInEditMode -> {
             val context = LocalContext.current

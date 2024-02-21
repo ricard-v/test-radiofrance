@@ -25,13 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import tech.mksoft.testradiofrance.R
-import tech.mksoft.testradiofrance.core.domain.model.RadioStation
 import tech.mksoft.testradiofrance.design.components.AppScaffold
 import tech.mksoft.testradiofrance.design.components.ErrorState
 import tech.mksoft.testradiofrance.design.components.LoadingState
 import tech.mksoft.testradiofrance.design.components.RadioStationCard
 import tech.mksoft.testradiofrance.design.tools.plus
 import tech.mksoft.testradiofrance.presentation.radiostations.RadioStationsViewModel
+import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationUi
 import tech.mksoft.testradiofrance.presentation.radiostations.model.RadioStationsUiState
 
 @Composable
@@ -98,20 +98,27 @@ private fun RadioStationsUiState.Success.RadioStationsList(
                 bottom = 40.dp,
                 end = 16.dp,
             ),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             items(
                 items = stations,
-                key = { stationItem -> stationItem.name },
-            ) { stationItem: RadioStation ->
+                key = { stationItem -> stationItem.data.name },
+            ) { stationItem: RadioStationUi ->
                 RadioStationCard(
-                    radioStation = stationItem,
+                    radioStation = stationItem.data,
                     onSeeAllProgramsClicked = {
-                        onStationClicked.invoke(stationItem)
+                        onStationClicked.invoke(stationItem.data)
                     },
                     onFavoriteClicked = {
                         onFavoriteButtonClicked.invoke(stationItem)
                     },
+                    onPlayLiveStreamClicked = stationItem.onPlayLiveStreamClicked?.let { onPlayLiveStreamClicked ->
+                        {
+                            onPlayLiveStreamClicked.invoke(stationItem)
+                        }
+                    },
+                    isFavorite = stationItem.isFavorite,
+                    isPlaying = stationItem.isPlaying,
                     modifier = Modifier.animateItemPlacement(),
                 )
             }
