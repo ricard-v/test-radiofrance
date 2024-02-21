@@ -1,0 +1,70 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.apollographql.apollo3' version '3.8.2' apply true
+}
+
+apollo {
+    service("service") {
+        packageName.set("tech.mksoft.testradiofrance.core")
+    }
+}
+
+android {
+    namespace 'tech.mksoft.testradiofrance.core'
+    compileSdk project.targetSdkVersion
+
+    defaultConfig {
+        minSdk project.minSdkVersion
+        targetSdk project.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility project.javaVersion
+        targetCompatibility project.javaVersion
+    }
+
+    kotlinOptions {
+        jvmTarget = project.kotlinJvmTarget
+    }
+}
+
+java {
+    sourceCompatibility = project.javaVersion
+    targetCompatibility = project.javaVersion
+}
+
+dependencies {
+    // Android X
+    implementation "androidx.core:core-ktx:$androidx_core_ktx_version"
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    // Kotlin
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // DI
+    implementation "io.insert-koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-core:$koin_version"
+
+    // Apollo
+    implementation "com.apollographql.apollo3:apollo-runtime:$apollo_version"
+
+    // Tests
+    // Tests > Unit
+    testImplementation "io.mockk:mockk:$mockk_version"
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutines_version"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+}
